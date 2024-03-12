@@ -1,0 +1,35 @@
+{
+  "name": "@quaimark/referral-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "build": "rm -rf ./dist && tsc",
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "Trung Do",
+  "license": "",
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "husky": "^9.0.11",
+    "jest": "^29.7.0",
+    "mongodb-memory-server-core": "^9.1.7",
+    "prettier": "^3.2.5",
+    "ts-jest": "^29.1.2",
+    "tsc": "^2.0.4",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "mongoose": "^8.2.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "prettier --write . && yarn run build && git add -A . "
+    }
+  }
+}
