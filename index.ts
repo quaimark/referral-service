@@ -2,7 +2,17 @@ export * from './types';
 export * from './models';
 import * as services from './services';
 
-const createServices = (dbConnection: string, dbName?: string) => {
+export type ReferralModuleExport = {
+  db: services.DatabaseService;
+  seasonService: services.SeasonService;
+  referralService: services.ReferralService;
+  pointService: services.PointService;
+};
+
+export const createServices = (
+  dbConnection: string,
+  dbName?: string,
+): ReferralModuleExport => {
   const db = new services.DatabaseService(dbConnection, dbName);
   return {
     db,
@@ -11,5 +21,3 @@ const createServices = (dbConnection: string, dbName?: string) => {
     pointService: new services.PointService(db),
   };
 };
-
-export default createServices;
