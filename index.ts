@@ -8,6 +8,7 @@ const createServices = (dbConnection: string) => {
     db,
     seasonService: new services.SeasonService(db),
     referralService: new services.ReferralService(db),
+    pointService: new services.PointService(db),
   };
 };
 

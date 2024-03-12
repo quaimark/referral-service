@@ -29,12 +29,7 @@ export const PointHistorySchema = new Schema<PointHistoryDocument>(
     block: Number,
     blockTime: Number,
     point: Number,
-    source: [
-      {
-        type: String,
-        point: Number,
-      },
-    ],
+    source: [Object],
     fee: Number,
     volume: Number,
     chain: String,
