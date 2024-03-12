@@ -26,6 +26,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createServices = void 0;
 __exportStar(require("./types"), exports);
 __exportStar(require("./models"), exports);
 const services = __importStar(require("./services"));
@@ -38,5 +39,5 @@ const createServices = (dbConnection, dbName) => {
         pointService: new services.PointService(db),
     };
 };
-exports.default = createServices;
+exports.createServices = createServices;
 //# sourceMappingURL=index.js.map
