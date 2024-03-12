@@ -8,9 +8,11 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const models_1 = require("../models");
 const types_1 = require("../types");
 class DatabaseService {
-    constructor(connectionString) {
+    constructor(connectionString, dbName) {
         this.connectionString = connectionString;
-        this.connection = mongoose_1.default.createConnection(this.connectionString, {});
+        this.connection = mongoose_1.default.createConnection(this.connectionString, {
+            dbName,
+        });
         this.pointHistoryModel = this.connection.model(types_1.CollectionName.PointHistory, models_1.PointHistorySchema);
         this.seasonModel = this.connection.model(types_1.CollectionName.Season, models_1.SeasonSchema);
         this.referralInfoModel = this.connection.model(types_1.CollectionName.ReferralInfo, models_1.ReferralInfoSchema);

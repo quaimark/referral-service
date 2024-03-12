@@ -10,8 +10,13 @@ import {
 import { CollectionName } from '../types';
 
 export class DatabaseService {
-  constructor(private readonly connectionString: string) {
-    this.connection = mongoose.createConnection(this.connectionString, {});
+  constructor(
+    private readonly connectionString: string,
+    dbName?: string,
+  ) {
+    this.connection = mongoose.createConnection(this.connectionString, {
+      dbName,
+    });
     this.pointHistoryModel = this.connection.model<PointHistoryDocument>(
       CollectionName.PointHistory,
       PointHistorySchema,

@@ -29,12 +29,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./types"), exports);
 __exportStar(require("./models"), exports);
 const services = __importStar(require("./services"));
-const createServices = (dbConnection) => {
-    const db = new services.DatabaseService(dbConnection);
+const createServices = (dbConnection, dbName) => {
+    const db = new services.DatabaseService(dbConnection, dbName);
     return {
         db,
         seasonService: new services.SeasonService(db),
         referralService: new services.ReferralService(db),
+        pointService: new services.PointService(db),
     };
 };
 exports.default = createServices;

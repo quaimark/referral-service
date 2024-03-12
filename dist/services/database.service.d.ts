@@ -26,7 +26,7 @@ import mongoose from 'mongoose';
 import { PointHistoryDocument, ReferralInfoDocument, SeasonDocument } from '../models';
 export declare class DatabaseService {
     private readonly connectionString;
-    constructor(connectionString: string);
+    constructor(connectionString: string, dbName?: string);
     connection: mongoose.Connection;
     pointHistoryModel: mongoose.Model<PointHistoryDocument>;
     seasonModel: mongoose.Model<SeasonDocument>;

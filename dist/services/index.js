@@ -17,4 +17,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./database.service"), exports);
 __exportStar(require("./season.service"), exports);
 __exportStar(require("./referral.service"), exports);
+__exportStar(require("./point.service"), exports);
 //# sourceMappingURL=index.js.map

@@ -2,8 +2,8 @@ export * from './types';
 export * from './models';
 import * as services from './services';
 
-const createServices = (dbConnection: string) => {
-  const db = new services.DatabaseService(dbConnection);
+const createServices = (dbConnection: string, dbName?: string) => {
+  const db = new services.DatabaseService(dbConnection, dbName);
   return {
     db,
     seasonService: new services.SeasonService(db),

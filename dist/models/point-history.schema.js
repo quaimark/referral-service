@@ -8,12 +8,7 @@ exports.PointHistorySchema = new mongoose_1.Schema({
     block: Number,
     blockTime: Number,
     point: Number,
-    source: [
-        {
-            type: String,
-            point: Number,
-        },
-    ],
+    source: [Object],
     fee: Number,
     volume: Number,
     chain: String,
