@@ -33,11 +33,11 @@ const referralModule = createServices(
 ```
 
 ### User ref 
-https://github.com/quaimark/quaimark-be/blob/main/packages/market-service/src/application/profile/profile.service.ts
+https://github.com/quaimark/quaimark-be/blob/dev/packages/market-service/src/application/profile/profile.service.ts
 
 ### Point query
-https://github.com/quaimark/quaimark-be/blob/main/packages/market-service/src/application/reward/reward.service.ts
+https://github.com/quaimark/quaimark-be/blob/dev/packages/market-service/src/application/reward/reward.service.ts
 
 ### Insert new point 
-https://github.com/quaimark/quaimark-be/blob/main/packages/onchain-worker/src/point/point.service.ts
+https://github.com/quaimark/quaimark-be/blob/dev/packages/onchain-worker/src/point/point-v2.service.ts
 
