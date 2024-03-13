@@ -7,7 +7,7 @@ This is a referral service that allows users to refer other users to a service.
 Add repo to your nodejs package.json file
 
 ```sh
-yarn add https://github.com/quaimark/referral-service.git#{tag}
+yarn add https://github.com/quaimark/referral-service.git#v0.2.0
 ```
 
 ```ts
@@ -31,3 +31,13 @@ const referralModule = createServices(
   defaultSeason,
 );
 ```
+
+### User ref 
+https://github.com/quaimark/quaimark-be/blob/dev/packages/market-service/src/application/profile/profile.service.ts
+
+### Point query
+https://github.com/quaimark/quaimark-be/blob/dev/packages/market-service/src/application/reward/reward.service.ts
+
+### Insert new point 
+https://github.com/quaimark/quaimark-be/blob/dev/packages/onchain-worker/src/point/point-v2.service.ts
+
