@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 export class ReferralService {
   constructor(private readonly db: DatabaseService) {}
 
-  async getReferralInfoByUserId(userId: string) {
+  async getReferralInfoByUserId(userId: string): Promise<ReferralInfoDocument> {
     const refInfo = await this.db.referralInfoModel.findOne({ userId }).exec();
     if (refInfo?.referralCode) {
       return refInfo;
@@ -34,7 +34,10 @@ export class ReferralService {
       .exec();
   }
 
-  async addRefBy(userId: string, refCode: string) {
+  async addRefBy(
+    userId: string,
+    refCode: string,
+  ): Promise<ReferralInfoDocument> {
     if (!refCode) {
       throw new Error('refCode is required');
     }
