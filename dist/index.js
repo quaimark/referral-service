@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createServices = void 0;
 __exportStar(require("./types"), exports);
 __exportStar(require("./models"), exports);
-const globalState_1 = require("globalState");
+const globalState_1 = require("./globalState");
 const services = __importStar(require("./services"));
 const createServices = (dbConnection, defaultSeason, dbName) => {
     globalState_1.globalState.defaultSeason = defaultSeason;

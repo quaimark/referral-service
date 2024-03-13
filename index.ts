@@ -1,6 +1,6 @@
 export * from './types';
 export * from './models';
-import { globalState } from 'globalState';
+import { globalState } from './globalState';
 import { Season } from './models';
 import * as services from './services';
 

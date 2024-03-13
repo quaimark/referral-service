@@ -8,7 +8,8 @@
     "test": "jest",
     "build": "rm -rf ./dist && tsc",
     "lint": "prettier --check .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "dev": "tsc -w"
   },
   "keywords": [],
   "author": "Trung Do",
