@@ -7,7 +7,7 @@ This is a referral service that allows users to refer other users to a service.
 Add repo to your nodejs package.json file
 
 ```sh
-yarn add https://github.com/quaimark/referral-service.git#{tag}
+yarn add https://github.com/quaimark/referral-service.git#v0.2.0
 ```
 
 ```ts
