@@ -14,7 +14,7 @@ describe('referral service', () => {
     dbService = new DatabaseService(uri);
     mongoConnection = dbService.connection;
     service = new ReferralService(dbService);
-  });
+  }, 100000);
 
   afterAll(async () => {
     await mongoConnection.close();

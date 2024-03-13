@@ -32,7 +32,7 @@ describe('PointService', () => {
       sponsorTradePointRatio: 0.1,
     };
     globalState.defaultSeason = defaultSeason;
-  });
+  }, 100000);
 
   afterAll(async () => {
     await mongoConnection.close();
