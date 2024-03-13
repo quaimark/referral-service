@@ -25,12 +25,13 @@
 import mongoose from 'mongoose';
 export type Season = {
     seasonNumber: number;
-    name: string;
-    startAt: Date;
+    name?: string;
+    startAt?: Date;
     endAt?: Date;
     pointTradeVolumeRatio: number;
     membershipPlusVolumeRatio: number;
     refTradePointRatio: number;
+    sponsorTradePointRatio: number;
     membershipShareFeeRatio: number;
 };
 export type SeasonDocument = Season & mongoose.Document;

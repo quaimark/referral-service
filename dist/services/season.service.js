@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SeasonService = void 0;
+const globalState_1 = require("../globalState");
 class SeasonService {
     constructor(db) {
         this.db = db;
@@ -21,14 +22,7 @@ class SeasonService {
                 .findOne()
                 .sort({ startAt: -1 })
                 .exec();
-            season = await this.db.seasonModel.create({
-                seasonNumber: latestSeason ? latestSeason.seasonNumber + 1 : 1,
-                startAt: (latestSeason === null || latestSeason === void 0 ? void 0 : latestSeason.endAt) || new Date(),
-                pointTradeVolumeRatio: 10,
-                membershipPlusVolumeRatio: 0.1,
-                refTradePointRatio: 0.1,
-                membershipShareFeeRatio: 0.05,
-            });
+            season = await this.db.seasonModel.create(Object.assign(Object.assign({}, globalState_1.globalState.defaultSeason), { seasonNumber: latestSeason ? latestSeason.seasonNumber + 1 : 1, startAt: (latestSeason === null || latestSeason === void 0 ? void 0 : latestSeason.endAt) || new Date() }));
         }
         return season;
     }

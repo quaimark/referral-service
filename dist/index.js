@@ -29,14 +29,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createServices = void 0;
 __exportStar(require("./types"), exports);
 __exportStar(require("./models"), exports);
+const globalState_1 = require("globalState");
 const services = __importStar(require("./services"));
-const createServices = (dbConnection, dbName) => {
+const createServices = (dbConnection, defaultSeason, dbName) => {
+    globalState_1.globalState.defaultSeason = defaultSeason;
     const db = new services.DatabaseService(dbConnection, dbName);
+    const seasonService = new services.SeasonService(db);
+    const referralService = new services.ReferralService(db);
+    const pointService = new services.PointService(db, seasonService);
     return {
         db,
-        seasonService: new services.SeasonService(db),
-        referralService: new services.ReferralService(db),
-        pointService: new services.PointService(db),
+        seasonService,
+        referralService,
+        pointService,
     };
 };
 exports.createServices = createServices;

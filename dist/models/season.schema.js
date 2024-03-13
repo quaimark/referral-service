@@ -14,5 +14,6 @@ exports.SeasonSchema = new mongoose_1.default.Schema({
     membershipPlusVolumeRatio: Number,
     refTradePointRatio: Number,
     membershipShareFeeRatio: Number,
+    sponsorTradePointRatio: Number,
 });
 //# sourceMappingURL=season.schema.js.map

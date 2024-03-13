@@ -22,7 +22,7 @@
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
 /// <reference types="mongoose/types/inferschematype" />
-import { ObjectId, Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 import { SeasonDocument } from './season.schema';
 export type PointSource = {
     type: string;
@@ -39,7 +39,7 @@ export type PointHistory = {
     chain: string;
     user: string;
     ref?: string;
-    season?: SeasonDocument | ObjectId;
+    season?: SeasonDocument;
 };
 export type PointHistoryDocument = PointHistory & Document;
 export declare const PointHistorySchema: Schema<PointHistoryDocument, import("mongoose").Model<PointHistoryDocument, any, any, any, import("mongoose").Document<unknown, any, PointHistoryDocument> & PointHistory & Document & {
