@@ -214,7 +214,7 @@ export class PointService {
 
     result.data = new PaginationDto<TopPointDto>(
       topPoints.map((t) => ({
-        user: t._id,
+        user: t._id.toString(),
         seasonPoint: t.seasonPoint,
         referralPoint: t.refPoint,
         tradingPoint: t.tradePoint,
@@ -259,7 +259,7 @@ export class PointService {
       point: 0,
       blockTime: h.blockTime.getTime(),
     };
-    
+
     const season =
       passSeason ||
       (await this.seasonService.getSeasonByTime(

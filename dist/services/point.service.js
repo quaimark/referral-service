@@ -156,7 +156,7 @@ class PointService {
         ]);
         const result = new types_1.BaseResultPagination();
         result.data = new types_1.PaginationDto(topPoints.map((t) => ({
-            user: t._id,
+            user: t._id.toString(),
             seasonPoint: t.seasonPoint,
             referralPoint: t.refPoint,
             tradingPoint: t.tradePoint,
