@@ -1,8 +1,11 @@
 import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import mongoose, { Connection } from 'mongoose';
+import { globalState } from '../globalState';
+import { PointHistoryDocument, Season } from '../models';
+import { GetTopPointParams } from '../types';
 import { DatabaseService } from './database.service';
 import { PointService } from './point.service';
-import { BaseQueryParams, GetTopPointParams } from '../types';
+import { SeasonService } from './season.service';
 
 describe('PointService', () => {
   let service: PointService;
@@ -18,7 +21,17 @@ describe('PointService', () => {
     const uri = mongod.getUri();
     dbService = new DatabaseService(uri);
     mongoConnection = dbService.connection;
-    service = new PointService(dbService);
+    const seasonService = new SeasonService(dbService);
+    service = new PointService(dbService, seasonService);
+    const defaultSeason: Season = {
+      seasonNumber: 1,
+      pointTradeVolumeRatio: 10,
+      membershipPlusVolumeRatio: 0.1,
+      refTradePointRatio: 0.05,
+      membershipShareFeeRatio: 0.05,
+      sponsorTradePointRatio: 0.1,
+    };
+    globalState.defaultSeason = defaultSeason;
   });
 
   afterAll(async () => {
@@ -47,7 +60,7 @@ describe('PointService', () => {
       // Create point history for the user
       const pointHistoryData = {
         user: user1,
-        blockTime: parseInt(String(new Date('2021-06-01').getTime() / 1000)),
+        blockTime: new Date('2021-06-01').getTime(),
         point: 100,
       };
       await dbService.pointHistoryModel.create(pointHistoryData);
@@ -69,7 +82,7 @@ describe('PointService', () => {
       // Create point history for the user
       const pointHistoryData = {
         user: user1,
-        blockTime: parseInt(String(new Date('2022-06-01').getTime() / 1000)),
+        blockTime: new Date('2022-06-01').getTime(),
         point: 200,
       };
       await dbService.pointHistoryModel.create(pointHistoryData);
@@ -134,9 +147,7 @@ describe('PointService', () => {
       };
       await dbService.seasonModel.create(currentSeasonData);
 
-      const blockTime = parseInt(
-        String(new Date('2022-06-01').getTime() / 1000),
-      );
+      const blockTime = new Date('2022-06-01').getTime();
       // Create point history for multiple users
       const pointHistoryData = [
         {
@@ -185,19 +196,19 @@ describe('PointService', () => {
       const pointHistoryData = [
         {
           user: user1,
-          blockTime: parseInt(String(new Date('2021-06-01').getTime() / 1000)),
+          blockTime: new Date('2021-06-01').getTime(),
           point: 100,
           source: [{ type: 'buy_volume', point: 100 }],
         },
         {
           user: user2,
-          blockTime: parseInt(String(new Date('2021-06-01').getTime() / 1000)),
+          blockTime: new Date('2021-06-01').getTime(),
           point: 200,
           source: [{ type: 'buy_volume', point: 200 }],
         },
         {
           user: user3,
-          blockTime: parseInt(String(new Date('2021-06-01').getTime() / 1000)),
+          blockTime: new Date('2021-06-01').getTime(),
           point: 150,
           source: [{ type: 'buy_volume', point: 150 }],
         },
@@ -231,19 +242,19 @@ describe('PointService', () => {
       const pointHistoryData = [
         {
           user: user1,
-          blockTime: parseInt(String(new Date('2022-06-01').getTime() / 1000)),
+          blockTime: new Date('2022-06-01').getTime(),
           point: 300,
           source: [{ type: 'buy_volume', point: 300 }],
         },
         {
           user: user2,
-          blockTime: parseInt(String(new Date('2022-06-01').getTime() / 1000)),
+          blockTime: new Date('2022-06-01').getTime(),
           point: 400,
           source: [{ type: 'buy_volume', point: 400 }],
         },
         {
           user: user3,
-          blockTime: parseInt(String(new Date('2022-06-01').getTime() / 1000)),
+          blockTime: new Date('2022-06-01').getTime(),
           point: 350,
           source: [{ type: 'buy_volume', point: 350 }],
         },
@@ -261,6 +272,173 @@ describe('PointService', () => {
       expect(result.data.items[0].seasonPoint).toBe(400);
       expect(result.data.items[0].referralPoint).toBe(0);
       expect(result.data.items[0].tradingPoint).toBe(400);
+    });
+  });
+
+  describe('pointCalculate', () => {
+    it('should calculate points for a buy user', async () => {
+      // Create a season
+      const seasonData = {
+        seasonNumber: 1,
+        startAt: new Date('2021-01-01'),
+        endAt: new Date('2021-12-31'),
+        pointTradeVolumeRatio: 10,
+        membershipPlusVolumeRatio: 0.1,
+        refTradePointRatio: 0.05,
+        membershipShareFeeRatio: 0.05,
+        sponsorTradePointRatio: 0.1,
+      };
+      const seasonEntity = await dbService.seasonModel.create(seasonData);
+
+      const h = {
+        to: user1,
+        from: user2,
+        price: 100,
+        txHash: 'hash123',
+        block: 123,
+        blockTime: new Date('2021-12-30'),
+        chain: 'chain123',
+        fee: 10,
+        isMembership: true,
+      };
+
+      await service.pointCalculate(h);
+
+      // Verify the point history for the buy user
+      const pointHistory = await dbService.pointHistoryModel.findOne({
+        user: user1,
+      });
+      if (!pointHistory) throw new Error('Point history not found');
+
+      expect(pointHistory).toBeDefined();
+      expect(pointHistory.user).toBe(user1);
+      expect(pointHistory.volume).toBe(h.price);
+      expect(pointHistory.txHash).toBe(h.txHash);
+      expect(pointHistory.block).toBe(h.block);
+      expect(pointHistory.chain).toBe(h.chain);
+      expect(pointHistory.fee).toBe(h.fee);
+      expect(pointHistory.point).toBe(1100); // calculated point value
+      expect(pointHistory.blockTime).toBe(h.blockTime.getTime());
+      expect(pointHistory.season?._id.toString()).toBe(
+        seasonEntity._id.toString(),
+      );
+      expect(pointHistory.source).toEqual([
+        { type: 'buy_volume', point: 1000 },
+        { type: 'membership', point: 100 },
+        // { type: 'apply_referral', point: 5 },
+      ]);
+    });
+
+    it('should calculate points for a sell user', async () => {
+      // Create a season
+      const seasonData = {
+        seasonNumber: 1,
+        startAt: new Date('2021-01-01'),
+        endAt: new Date('2021-12-31'),
+        pointTradeVolumeRatio: 10,
+        membershipPlusVolumeRatio: 0.1,
+        refTradePointRatio: 0.05,
+        membershipShareFeeRatio: 0.05,
+        sponsorTradePointRatio: 0.1,
+      };
+      const seasonEntity = await dbService.seasonModel.create(seasonData);
+
+      const h = {
+        to: user1,
+        from: user2,
+        price: 100,
+        txHash: 'hash123',
+        block: 123,
+        blockTime: new Date('2021-12-30'),
+        chain: 'chain123',
+        fee: 10,
+        isMembership: false,
+      };
+
+      await service.pointCalculate(h, true);
+
+      // Verify the point history for the sell user
+      const pointHistory = await dbService.pointHistoryModel.findOne({
+        user: user2,
+      });
+      if (!pointHistory) throw new Error('Point history not found');
+
+      expect(pointHistory).toBeDefined();
+      expect(pointHistory.user).toBe(user2);
+      expect(pointHistory.volume).toBe(h.price);
+      expect(pointHistory.txHash).toBe(h.txHash);
+      expect(pointHistory.block).toBe(h.block);
+      expect(pointHistory.chain).toBe(h.chain);
+      expect(pointHistory.fee).toBe(h.fee);
+      expect(pointHistory.point).toBe(1000); // calculated point value
+      expect(pointHistory.blockTime).toBe(h.blockTime.getTime());
+      expect(pointHistory.season?._id.toString()).toBe(
+        seasonEntity._id.toString(),
+      );
+      expect(pointHistory.source).toEqual([
+        { type: 'sell_volume', point: 1000 },
+      ]);
+    });
+
+    it('should calculate points for a sponsor', async () => {
+      // Create a season
+      const seasonData = {
+        seasonNumber: 1,
+        startAt: new Date('2021-01-01'),
+        endAt: new Date('2021-12-31'),
+        pointTradeVolumeRatio: 10,
+        membershipPlusVolumeRatio: 0.1,
+        refTradePointRatio: 0.05,
+        membershipShareFeeRatio: 0.05,
+        sponsorTradePointRatio: 0.1,
+      };
+      const seasonEntity = await dbService.seasonModel.create(seasonData);
+
+      // Create referral info for the buy user
+      await dbService.referralInfoModel.create({
+        userId: user1,
+        referredBy: 'refCode123',
+      });
+
+      // Create referral info for the sponsor
+      await dbService.referralInfoModel.create({
+        userId: user2,
+        referralCode: 'refCode123',
+      });
+
+      const h = {
+        to: user1,
+        from: user2,
+        price: 100,
+        txHash: 'hash123',
+        block: 123,
+        blockTime: new Date('2021-12-30'),
+        chain: 'chain123',
+        fee: 10,
+        isMembership: false,
+      };
+
+      await service.pointCalculate(h);
+
+      // Verify the point history for the sponsor
+      const pointHistory = await dbService.pointHistoryModel.findOne({
+        user: user2,
+      });
+      if (!pointHistory) throw new Error('Point history not found');
+
+      expect(pointHistory).toBeDefined();
+      expect(pointHistory.user).toBe(user2);
+      expect(pointHistory.volume).toBe(h.price);
+      expect(pointHistory.txHash).toBe(h.txHash);
+      expect(pointHistory.block).toBe(h.block);
+      expect(pointHistory.chain).toBe(h.chain);
+      expect(pointHistory.fee).toBe(h.fee);
+      expect(pointHistory.point).toBe(100); // calculated point value
+      expect(pointHistory.blockTime).toBe(h.blockTime.getTime());
+      expect(pointHistory.season?._id.toString()).toBe(
+        seasonEntity._id.toString(),
+      );
+      expect(pointHistory.source).toEqual([{ type: 'referral', point: 100 }]);
     });
   });
 });

@@ -2,7 +2,8 @@ import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import { Connection } from 'mongoose';
 import { DatabaseService } from './database.service';
 import { SeasonService } from './season.service';
-
+import { globalState } from '../globalState';
+import { Season } from '../models';
 describe('season service', () => {
   let service: SeasonService;
   let dbService: DatabaseService;
@@ -15,6 +16,15 @@ describe('season service', () => {
     dbService = new DatabaseService(uri);
     mongoConnection = dbService.connection;
     service = new SeasonService(dbService);
+    const defaultSeason: Season = {
+      seasonNumber: 1,
+      pointTradeVolumeRatio: 10,
+      membershipPlusVolumeRatio: 0.1,
+      refTradePointRatio: 0.05,
+      membershipShareFeeRatio: 0.05,
+      sponsorTradePointRatio: 0.1,
+    };
+    globalState.defaultSeason = defaultSeason;
   });
 
   afterAll(async () => {

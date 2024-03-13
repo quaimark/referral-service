@@ -1,3 +1,4 @@
+import { globalState } from '../globalState';
 import { SeasonDocument } from '../models';
 import { DatabaseService } from './database.service';
 
@@ -23,12 +24,9 @@ export class SeasonService {
         .sort({ startAt: -1 })
         .exec();
       season = await this.db.seasonModel.create({
+        ...globalState.defaultSeason,
         seasonNumber: latestSeason ? latestSeason.seasonNumber + 1 : 1,
         startAt: latestSeason?.endAt || new Date(),
-        pointTradeVolumeRatio: 10,
-        membershipPlusVolumeRatio: 0.1,
-        refTradePointRatio: 0.1,
-        membershipShareFeeRatio: 0.05,
       });
     }
     return season;

@@ -18,7 +18,7 @@ export type PointHistory = {
   chain: string;
   user: string;
   ref?: string;
-  season?: SeasonDocument | ObjectId;
+  season?: SeasonDocument;
 };
 
 export type PointHistoryDocument = PointHistory & Document;
