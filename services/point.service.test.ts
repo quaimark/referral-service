@@ -20,6 +20,7 @@ describe('PointService', () => {
     mongod = await MongoMemoryServer.create();
     const uri = mongod.getUri();
     dbService = new DatabaseService(uri);
+    await dbService.waitForConnection();
     mongoConnection = dbService.connection;
     const seasonService = new SeasonService(dbService);
     service = new PointService(dbService, seasonService);

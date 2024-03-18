@@ -11,13 +11,14 @@ export type ReferralModuleExport = {
   pointService: services.PointService;
 };
 
-export const createServices = (
+export const createServices = async (
   dbConnection: string,
   defaultSeason: Season,
   dbName?: string,
-): ReferralModuleExport => {
+): Promise<ReferralModuleExport> => {
   globalState.defaultSeason = defaultSeason;
   const db = new services.DatabaseService(dbConnection, dbName);
+  await db.waitForConnection();
   const seasonService = new services.SeasonService(db);
   const referralService = new services.ReferralService(db);
   const pointService = new services.PointService(db, seasonService);

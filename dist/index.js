@@ -31,9 +31,10 @@ __exportStar(require("./types"), exports);
 __exportStar(require("./models"), exports);
 const globalState_1 = require("./globalState");
 const services = __importStar(require("./services"));
-const createServices = (dbConnection, defaultSeason, dbName) => {
+const createServices = async (dbConnection, defaultSeason, dbName) => {
     globalState_1.globalState.defaultSeason = defaultSeason;
     const db = new services.DatabaseService(dbConnection, dbName);
+    await db.waitForConnection();
     const seasonService = new services.SeasonService(db);
     const referralService = new services.ReferralService(db);
     const pointService = new services.PointService(db, seasonService);

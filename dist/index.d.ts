@@ -8,4 +8,4 @@ export type ReferralModuleExport = {
     referralService: services.ReferralService;
     pointService: services.PointService;
 };
-export declare const createServices: (dbConnection: string, defaultSeason: Season, dbName?: string) => ReferralModuleExport;
+export declare const createServices: (dbConnection: string, defaultSeason: Season, dbName?: string) => Promise<ReferralModuleExport>;

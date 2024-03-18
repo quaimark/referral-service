@@ -43,6 +43,17 @@ export class DatabaseService {
     };
     connectWithRetry();
   }
+  waitForConnection() {
+    return new Promise((resolve) => {
+      if (this.connection) {
+        resolve(true);
+      } else {
+        setTimeout(() => {
+          this.waitForConnection().then(resolve);
+        }, 1000);
+      }
+    });
+  }
   public connection: mongoose.Connection;
   public pointHistoryModel: mongoose.Model<PointHistoryDocument>;
   public seasonModel: mongoose.Model<SeasonDocument>;

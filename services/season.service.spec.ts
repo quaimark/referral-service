@@ -14,6 +14,7 @@ describe('season service', () => {
     mongod = await MongoMemoryServer.create();
     const uri = mongod.getUri();
     dbService = new DatabaseService(uri);
+    await dbService.waitForConnection();
     mongoConnection = dbService.connection;
     service = new SeasonService(dbService);
     const defaultSeason: Season = {

@@ -29,6 +29,18 @@ class DatabaseService {
         };
         connectWithRetry();
     }
+    waitForConnection() {
+        return new Promise((resolve) => {
+            if (this.connection) {
+                resolve(true);
+            }
+            else {
+                setTimeout(() => {
+                    this.waitForConnection().then(resolve);
+                }, 1000);
+            }
+        });
+    }
 }
 exports.DatabaseService = DatabaseService;
 //# sourceMappingURL=database.service.js.map
