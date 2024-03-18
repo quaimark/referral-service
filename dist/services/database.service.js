@@ -10,12 +10,24 @@ const types_1 = require("../types");
 class DatabaseService {
     constructor(connectionString, dbName) {
         this.connectionString = connectionString;
-        this.connection = mongoose_1.default.createConnection(this.connectionString, {
-            dbName,
-        });
-        this.pointHistoryModel = this.connection.model(types_1.CollectionName.PointHistory, models_1.PointHistorySchema);
-        this.seasonModel = this.connection.model(types_1.CollectionName.Season, models_1.SeasonSchema);
-        this.referralInfoModel = this.connection.model(types_1.CollectionName.ReferralInfo, models_1.ReferralInfoSchema);
+        this.dbName = dbName;
+        const connectWithRetry = async () => {
+            try {
+                this.connection = await mongoose_1.default
+                    .createConnection(this.connectionString, {
+                    dbName: this.dbName,
+                })
+                    .asPromise();
+                this.pointHistoryModel = this.connection.model(types_1.CollectionName.PointHistory, models_1.PointHistorySchema);
+                this.seasonModel = this.connection.model(types_1.CollectionName.Season, models_1.SeasonSchema);
+                this.referralInfoModel = this.connection.model(types_1.CollectionName.ReferralInfo, models_1.ReferralInfoSchema);
+            }
+            catch (error) {
+                console.error('Failed to connect to mongo on startup - retrying in 5 sec', error);
+                setTimeout(connectWithRetry, 5000);
+            }
+        };
+        connectWithRetry();
     }
 }
 exports.DatabaseService = DatabaseService;
