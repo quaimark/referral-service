@@ -1,5 +1,5 @@
 import { PointHistoryDocument, Season } from 'models';
-import { BaseQueryParams, BaseResultPagination, GetTopPointParams, TopPointDto } from '../types';
+import { BaseQueryParams, BaseResultPagination, GetTopPointParams, TopByRefDto, TopPointDto } from '../types';
 import { DatabaseService } from './database.service';
 import { SeasonService } from './season.service';
 export declare class PointService {
@@ -26,4 +26,5 @@ export declare class PointService {
         fee: number;
         isMembership: boolean;
     }, addPointForSeller?: boolean, passSeason?: Season): Promise<import("mongodb").BulkWriteResult>;
+    topByRefCode(param: BaseQueryParams): Promise<BaseResultPagination<TopByRefDto>>;
 }

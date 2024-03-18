@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetTopPointParams = exports.TopPointDto = exports.BaseResultPagination = exports.PaginationDto = exports.BaseQueryParams = exports.CollectionName = void 0;
+exports.TopByRefDto = exports.GetTopPointParams = exports.TopPointDto = exports.BaseResultPagination = exports.PaginationDto = exports.BaseQueryParams = exports.CollectionName = void 0;
 const mongodb_1 = require("mongodb");
 var CollectionName;
 (function (CollectionName) {
@@ -84,4 +84,7 @@ exports.TopPointDto = TopPointDto;
 class GetTopPointParams extends BaseQueryParams {
 }
 exports.GetTopPointParams = GetTopPointParams;
+class TopByRefDto {
+}
+exports.TopByRefDto = TopByRefDto;
 //# sourceMappingURL=index.js.map

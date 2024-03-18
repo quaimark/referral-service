@@ -114,3 +114,9 @@ export class TopPointDto {
 export class GetTopPointParams extends BaseQueryParams {
   seasonNumber: number;
 }
+
+export class TopByRefDto {
+  user: string;
+  refCode: string;
+  count: number;
+}

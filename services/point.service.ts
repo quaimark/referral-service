@@ -7,8 +7,10 @@ import {
 import {
   BaseQueryParams,
   BaseResultPagination,
+  CollectionName,
   GetTopPointParams,
   PaginationDto,
+  TopByRefDto,
   TopPointDto,
 } from '../types';
 import { DatabaseService } from './database.service';
@@ -387,5 +389,62 @@ export class PointService {
     }
 
     return await this.db.pointHistoryModel.bulkWrite(bulkWrite);
+  }
+
+  async topByRefCode(param: BaseQueryParams) {
+    const result = new BaseResultPagination<TopByRefDto>();
+    const { page, skipIndex, size } = param;
+    const data: {
+      _id: string;
+      user: string;
+      count: number;
+    }[] = await this.db.referralInfoModel.aggregate([
+      {
+        $match: { referredBy: { $ne: null } },
+      },
+      {
+        $group: {
+          _id: '$referredBy',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          count: -1,
+        },
+      },
+      { $skip: skipIndex },
+      { $limit: size },
+      {
+        $lookup: {
+          from: 'referral_infos',
+          localField: '_id',
+          foreignField: 'referralCode',
+          as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $project: {
+          _id: '$_id',
+          user: '$user.userId',
+          count: '$count',
+        },
+      },
+    ]);
+    const total = data.length;
+    result.data = new PaginationDto<TopByRefDto>(
+      data.map((t) => ({
+        user: t.user,
+        count: t.count,
+        refCode: t._id,
+      })),
+      total,
+      page,
+      size,
+    );
+    return result;
   }
 }

@@ -287,6 +287,53 @@ class PointService {
         }
         return await this.db.pointHistoryModel.bulkWrite(bulkWrite);
     }
+    async topByRefCode(param) {
+        const result = new types_1.BaseResultPagination();
+        const { page, skipIndex, size } = param;
+        const data = await this.db.referralInfoModel.aggregate([
+            {
+                $match: { referredBy: { $ne: null } },
+            },
+            {
+                $group: {
+                    _id: '$referredBy',
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $sort: {
+                    count: -1,
+                },
+            },
+            { $skip: skipIndex },
+            { $limit: size },
+            {
+                $lookup: {
+                    from: 'referral_infos',
+                    localField: '_id',
+                    foreignField: 'referralCode',
+                    as: 'user',
+                },
+            },
+            {
+                $unwind: '$user',
+            },
+            {
+                $project: {
+                    _id: '$_id',
+                    user: '$user.userId',
+                    count: '$count',
+                },
+            },
+        ]);
+        const total = data.length;
+        result.data = new types_1.PaginationDto(data.map((t) => ({
+            user: t.user,
+            count: t.count,
+            refCode: t._id,
+        })), total, page, size);
+        return result;
+    }
 }
 exports.PointService = PointService;
 //# sourceMappingURL=point.service.js.map
