@@ -25,6 +25,7 @@ export declare class PointService {
         chain: string;
         fee: number;
         isMembership: boolean;
+        plusPercent?: number;
     }, addPointForSeller?: boolean, passSeason?: Season): Promise<import("mongodb").BulkWriteResult>;
     topByRefCode(param: BaseQueryParams): Promise<BaseResultPagination<TopByRefDto>>;
 }
