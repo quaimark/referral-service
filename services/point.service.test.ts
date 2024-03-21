@@ -330,6 +330,62 @@ describe('PointService', () => {
       ]);
     });
 
+    it('should calculate points for a buy user with plus percent', async () => {
+      // Create a season
+      const seasonData = {
+        seasonNumber: 1,
+        startAt: new Date('2021-01-01'),
+        endAt: new Date('2021-12-31'),
+        pointTradeVolumeRatio: 10,
+        membershipPlusVolumeRatio: 0.1,
+        refTradePointRatio: 0.05,
+        membershipShareFeeRatio: 0.05,
+        sponsorTradePointRatio: 0.1,
+      };
+      const seasonEntity = await dbService.seasonModel.create(seasonData);
+
+      const h = {
+        to: user1,
+        from: user2,
+        price: 100,
+        txHash: 'hash123',
+        block: 123,
+        blockTime: new Date('2021-12-30'),
+        chain: 'chain123',
+        fee: 10,
+        isMembership: true,
+        plusPercent: 0.1,
+      };
+
+      await service.pointCalculate(h);
+
+      // Verify the point history for the buy user
+      const pointHistory = await dbService.pointHistoryModel.findOne({
+        user: user1,
+      });
+      if (!pointHistory) throw new Error('Point history not found');
+
+      expect(pointHistory).toBeDefined();
+      expect(pointHistory.user).toBe(user1);
+      expect(pointHistory.volume).toBe(h.price);
+      expect(pointHistory.txHash).toBe(h.txHash);
+      expect(pointHistory.block).toBe(h.block);
+      expect(pointHistory.chain).toBe(h.chain);
+      expect(pointHistory.fee).toBe(h.fee);
+      expect(pointHistory.point).toBe(1200); // calculated point value
+      expect(pointHistory.blockTime).toBe(h.blockTime.getTime());
+      expect(pointHistory.season?._id.toString()).toBe(
+        seasonEntity._id.toString(),
+      );
+      expect(pointHistory.source).toEqual([
+        { type: 'buy_volume', point: 1000 },
+        { type: 'membership', point: 100 },
+        { type: 'plus', point: 100 },
+
+        // { type: 'apply_referral', point: 5 },
+      ]);
+    });
+
     it('should calculate points for a sell user', async () => {
       // Create a season
       const seasonData = {

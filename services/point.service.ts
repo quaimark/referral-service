@@ -245,6 +245,7 @@ export class PointService {
       chain: string;
       fee: number;
       isMembership: boolean;
+      plusPercent?: number;
     },
     addPointForSeller = false,
     passSeason?: Season,
@@ -388,6 +389,17 @@ export class PointService {
       });
     }
 
+    if (h.plusPercent && h.plusPercent > 0) {
+      for (const d of bulkWrite) {
+        const data: PointHistory = d.updateOne.update;
+        const pointPlus = data.source[0].point * h.plusPercent;
+        data.point = data.point + pointPlus;
+        data.source.push({
+          type: 'plus',
+          point: pointPlus,
+        });
+      }
+    }
     return await this.db.pointHistoryModel.bulkWrite(bulkWrite);
   }
 
