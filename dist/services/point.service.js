@@ -345,6 +345,74 @@ class PointService {
         })), total, page, size);
         return result;
     }
+    async userRefStats(userId) {
+        const total = await this.db.pointHistoryModel.countDocuments({
+            user: userId,
+            ref: { $ne: null },
+        });
+        if (!total)
+            return {
+                id: userId,
+                total,
+                ranking: -1,
+                count: 0,
+                countRef: 0,
+            };
+        const ranking = await this.db.pointHistoryModel.aggregate([
+            {
+                $match: {
+                    ref: { $ne: null },
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        user: '$user',
+                        ref: '$ref',
+                    },
+                    total: {
+                        $sum: '$point',
+                    },
+                    count: {
+                        $sum: 1,
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: '$_id.user',
+                    countRef: {
+                        $sum: 1,
+                    },
+                    total: {
+                        $sum: '$total',
+                    },
+                    count: {
+                        $sum: '$count',
+                    },
+                },
+            },
+            {
+                $sort: {
+                    total: -1,
+                },
+            },
+            {
+                $setWindowFields: {
+                    partitionBy: null,
+                    sortBy: { total: -1 },
+                    output: { ranking: { $denseRank: {} } },
+                },
+            },
+            {
+                $match: {
+                    _id: userId,
+                },
+            },
+        ]);
+        return ranking.length > 0
+            ? Object.assign(Object.assign({}, ranking[0]), { id: userId }) : { id: userId, total, ranking: -1, count: 0, countRef: 0 };
+    }
 }
 exports.PointService = PointService;
 //# sourceMappingURL=point.service.js.map

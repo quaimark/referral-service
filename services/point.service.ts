@@ -459,4 +459,87 @@ export class PointService {
     );
     return result;
   }
+
+  async userRefStats(userId: string): Promise<{
+    id: string;
+    total: number;
+    ranking: number;
+    count: number;
+    countRef: number;
+  }> {
+    const total = await this.db.pointHistoryModel.countDocuments({
+      user: userId,
+      ref: { $ne: null },
+    });
+    if (!total)
+      return {
+        id: userId,
+        total,
+        ranking: -1,
+        count: 0,
+        countRef: 0,
+      };
+
+    const ranking: {
+      _id: string;
+      total: number;
+      ranking: number;
+      count: number;
+      countRef: number;
+    }[] = await this.db.pointHistoryModel.aggregate([
+      {
+        $match: {
+          ref: { $ne: null },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            user: '$user',
+            ref: '$ref',
+          },
+          total: {
+            $sum: '$point',
+          },
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$_id.user',
+          countRef: {
+            $sum: 1,
+          },
+          total: {
+            $sum: '$total',
+          },
+          count: {
+            $sum: '$count',
+          },
+        },
+      },
+      {
+        $sort: {
+          total: -1,
+        },
+      },
+      {
+        $setWindowFields: {
+          partitionBy: null,
+          sortBy: { total: -1 },
+          output: { ranking: { $denseRank: {} } },
+        },
+      },
+      {
+        $match: {
+          _id: userId,
+        },
+      },
+    ]);
+    return ranking.length > 0
+      ? { ...ranking[0], id: userId }
+      : { id: userId, total, ranking: -1, count: 0, countRef: 0 };
+  }
 }
