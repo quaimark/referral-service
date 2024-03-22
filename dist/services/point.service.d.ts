@@ -34,5 +34,6 @@ export declare class PointService {
         ranking: number;
         count: number;
         countRef: number;
+        allRef: number;
     }>;
 }

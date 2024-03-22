@@ -466,10 +466,15 @@ export class PointService {
     ranking: number;
     count: number;
     countRef: number;
+    allRef: number;
   }> {
     const total = await this.db.pointHistoryModel.countDocuments({
       user: userId,
       ref: { $ne: null },
+    });
+    const refInfo = await this.db.referralInfoModel.findOne({ userId });
+    const allRef = await this.db.referralInfoModel.countDocuments({
+      referredBy: refInfo.referralCode,
     });
     if (!total)
       return {
@@ -478,14 +483,15 @@ export class PointService {
         ranking: -1,
         count: 0,
         countRef: 0,
+        allRef,
       };
 
     const ranking: {
       _id: string;
-      total: number;
-      ranking: number;
-      count: number;
-      countRef: number;
+      total: number; // total point
+      ranking: number; // ranking
+      count: number; // total trade count
+      countRef: number; // total ref count has trade
     }[] = await this.db.pointHistoryModel.aggregate([
       {
         $match: {
@@ -538,8 +544,13 @@ export class PointService {
         },
       },
     ]);
-    return ranking.length > 0
-      ? { ...ranking[0], id: userId }
-      : { id: userId, total, ranking: -1, count: 0, countRef: 0 };
+    const rs =
+      ranking.length > 0
+        ? { ...ranking[0], id: userId }
+        : { id: userId, total, ranking: -1, count: 0, countRef: 0 };
+    return {
+      ...rs,
+      allRef,
+    };
   }
 }

@@ -350,6 +350,10 @@ class PointService {
             user: userId,
             ref: { $ne: null },
         });
+        const refInfo = await this.db.referralInfoModel.findOne({ userId });
+        const allRef = await this.db.referralInfoModel.countDocuments({
+            referredBy: refInfo.referralCode,
+        });
         if (!total)
             return {
                 id: userId,
@@ -357,6 +361,7 @@ class PointService {
                 ranking: -1,
                 count: 0,
                 countRef: 0,
+                allRef,
             };
         const ranking = await this.db.pointHistoryModel.aggregate([
             {
@@ -410,8 +415,9 @@ class PointService {
                 },
             },
         ]);
-        return ranking.length > 0
+        const rs = ranking.length > 0
             ? Object.assign(Object.assign({}, ranking[0]), { id: userId }) : { id: userId, total, ranking: -1, count: 0, countRef: 0 };
+        return Object.assign(Object.assign({}, rs), { allRef });
     }
 }
 exports.PointService = PointService;
