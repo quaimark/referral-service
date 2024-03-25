@@ -93,6 +93,8 @@ export class ReferralService {
   ): Promise<
     BaseResultPagination<{ userId: string; point: number; lastTime: Date }>
   > {
+    const sort: any = {};
+    sort[params.orderBy || 'point'] = params.desc === 'asc' ? 1 : -1;
     const refs: {
       point: number;
       user: string;
@@ -130,9 +132,7 @@ export class ReferralService {
         },
       },
       {
-        $sort: {
-          point: -1,
-        },
+        $sort: sort,
       },
       {
         $skip: params.skipIndex,

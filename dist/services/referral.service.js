@@ -72,6 +72,8 @@ class ReferralService {
         return ref;
     }
     async getListReferralInfoByRefCode(refCode, params) {
+        const sort = {};
+        sort[params.orderBy || 'point'] = params.desc === 'asc' ? 1 : -1;
         const refs = await this.db.referralInfoModel.aggregate([
             {
                 $match: {
@@ -105,9 +107,7 @@ class ReferralService {
                 },
             },
             {
-                $sort: {
-                    point: -1,
-                },
+                $sort: sort,
             },
             {
                 $skip: params.skipIndex,
