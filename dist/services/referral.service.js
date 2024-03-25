@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReferralService = void 0;
+const types_1 = require("../types");
 const node_crypto_1 = __importDefault(require("node:crypto"));
 class ReferralService {
     constructor(db) {
@@ -69,6 +70,58 @@ class ReferralService {
             upsert: true,
         });
         return ref;
+    }
+    async getListReferralInfoByRefCode(refCode, params) {
+        const refs = await this.db.referralInfoModel.aggregate([
+            {
+                $match: {
+                    referredBy: refCode,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'point_histories',
+                    pipeline: [
+                        {
+                            $group: {
+                                _id: null,
+                                point: {
+                                    $sum: '$point',
+                                },
+                            },
+                        },
+                    ],
+                    localField: 'userId',
+                    foreignField: 'ref',
+                    as: 'point_histories',
+                },
+            },
+            {
+                $project: {
+                    point: {
+                        $first: '$point_histories.point',
+                    },
+                    user: '$userId',
+                },
+            },
+            {
+                $sort: {
+                    point: -1,
+                },
+            },
+            {
+                $skip: params.skipIndex,
+            },
+            {
+                $limit: params.size,
+            },
+        ]);
+        const rs = new types_1.BaseResultPagination();
+        rs.data = new types_1.PaginationDto(refs.map((r) => ({
+            userId: r.user,
+            point: r.point,
+        })), refs.length, params.page, params.size);
+        return rs;
     }
 }
 exports.ReferralService = ReferralService;

@@ -1,3 +1,4 @@
+import { BaseQueryParams, BaseResultPagination, PaginationDto } from '../types';
 import { ReferralInfoDocument } from '../models';
 import { DatabaseService } from './database.service';
 import crypto from 'node:crypto';
@@ -84,5 +85,71 @@ export class ReferralService {
       },
     );
     return ref;
+  }
+
+  async getListReferralInfoByRefCode(
+    refCode: string,
+    params: BaseQueryParams,
+  ): Promise<BaseResultPagination<{ userId: string; point: number }>> {
+    const refs: {
+      point: number;
+      user: string;
+    }[] = await this.db.referralInfoModel.aggregate([
+      {
+        $match: {
+          referredBy: refCode,
+        },
+      },
+      {
+        $lookup: {
+          from: 'point_histories',
+          pipeline: [
+            {
+              $group: {
+                _id: null,
+                point: {
+                  $sum: '$point',
+                },
+              },
+            },
+          ],
+          localField: 'userId',
+          foreignField: 'ref',
+          as: 'point_histories',
+        },
+      },
+      {
+        $project: {
+          point: {
+            $first: '$point_histories.point',
+          },
+          user: '$userId',
+        },
+      },
+      {
+        $sort: {
+          point: -1,
+        },
+      },
+      {
+        $skip: params.skipIndex,
+      },
+      {
+        $limit: params.size,
+      },
+    ]);
+
+    const rs = new BaseResultPagination<{ userId: string; point: number }>();
+    rs.data = new PaginationDto<{ userId: string; point: number }>(
+      refs.map((r) => ({
+        userId: r.user,
+        point: r.point,
+      })),
+      refs.length,
+      params.page,
+      params.size,
+    );
+
+    return rs;
   }
 }
