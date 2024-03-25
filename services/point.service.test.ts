@@ -300,7 +300,7 @@ describe('PointService', () => {
         blockTime: new Date('2021-12-30'),
         chain: 'chain123',
         fee: 10,
-        isMembership: true,
+        addPointForMembership: true,
       };
 
       await service.pointCalculate(h);
@@ -353,7 +353,7 @@ describe('PointService', () => {
         blockTime: new Date('2021-12-30'),
         chain: 'chain123',
         fee: 10,
-        isMembership: true,
+        addPointForMembership: true,
         plusPercent: 0.1,
       };
 
@@ -410,9 +410,10 @@ describe('PointService', () => {
         chain: 'chain123',
         fee: 10,
         isMembership: false,
+        addPointForSeller: true,
       };
 
-      await service.pointCalculate(h, true);
+      await service.pointCalculate(h);
 
       // Verify the point history for the sell user
       const pointHistory = await dbService.pointHistoryModel.findOne({
@@ -473,6 +474,7 @@ describe('PointService', () => {
         chain: 'chain123',
         fee: 10,
         isMembership: false,
+        addPointForSponsor: true,
       };
 
       await service.pointCalculate(h);

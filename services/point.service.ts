@@ -244,14 +244,16 @@ export class PointService {
       blockTime: Date;
       chain: string;
       fee: number;
-      isMembership: boolean;
+      addPointForMembership?: boolean;
+      addPointForSponsor?: boolean;
+      addPointForReferral?: boolean;
+      addPointForSeller?: boolean;
       plusPercent?: number;
     },
-    addPointForSeller = false,
     passSeason?: Season,
   ) {
     const fee = h.fee;
-    const isMemberShip = h.isMembership;
+    const isMemberShip = h.addPointForMembership;
     const pointHistory: PointHistory = {
       user: h.to,
       volume: h.price,
@@ -277,6 +279,8 @@ export class PointService {
       type: 'buy_volume',
       point: tradeVolumePoint,
     });
+
+    // add point for membership
     if (isMemberShip) {
       const pointPlus = tradeVolumePoint * season.membershipPlusVolumeRatio;
       source.push({
@@ -288,7 +292,10 @@ export class PointService {
     const userInfo = await this.db.referralInfoModel.findOne({
       userId: pointHistory.user,
     });
+
+    // add point for referral
     if (
+      h.addPointForReferral &&
       userInfo?.referredBy &&
       season.refTradePointRatio &&
       season.refTradePointRatio > 0
@@ -315,18 +322,18 @@ export class PointService {
     });
 
     // add point for sponsor
-
-    const refUser = userInfo?.referredBy
-      ? await this.db.referralInfoModel.findOne({
-          referralCode: userInfo.referredBy,
-        })
-      : undefined;
     const refSource = [];
     if (
-      refUser &&
+      h.addPointForSponsor &&
       season.sponsorTradePointRatio &&
       season.sponsorTradePointRatio > 0
     ) {
+      const refUser = userInfo?.referredBy
+        ? await this.db.referralInfoModel.findOne({
+            referralCode: userInfo.referredBy,
+          })
+        : undefined;
+      if (!refUser) return;
       const refPoint = tradeVolumePoint * season.sponsorTradePointRatio;
       refSource.push({
         type: 'referral',
@@ -359,7 +366,7 @@ export class PointService {
       });
     }
 
-    if (addPointForSeller) {
+    if (h.addPointForSeller) {
       const sellerPointHistory: PointHistory = {
         user: h.from,
         volume: pointHistory.volume,

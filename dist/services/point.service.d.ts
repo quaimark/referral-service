@@ -24,9 +24,12 @@ export declare class PointService {
         blockTime: Date;
         chain: string;
         fee: number;
-        isMembership: boolean;
+        addPointForMembership?: boolean;
+        addPointForSponsor?: boolean;
+        addPointForReferral?: boolean;
+        addPointForSeller?: boolean;
         plusPercent?: number;
-    }, addPointForSeller?: boolean, passSeason?: Season): Promise<import("mongodb").BulkWriteResult>;
+    }, passSeason?: Season): Promise<import("mongodb").BulkWriteResult>;
     topByRefCode(param: BaseQueryParams): Promise<BaseResultPagination<TopByRefDto>>;
     userRefStats(userId: string): Promise<{
         id: string;
