@@ -90,10 +90,13 @@ export class ReferralService {
   async getListReferralInfoByRefCode(
     refCode: string,
     params: BaseQueryParams,
-  ): Promise<BaseResultPagination<{ userId: string; point: number }>> {
+  ): Promise<
+    BaseResultPagination<{ userId: string; point: number; lastTime: Date }>
+  > {
     const refs: {
       point: number;
       user: string;
+      lastTime: Date;
     }[] = await this.db.referralInfoModel.aggregate([
       {
         $match: {
@@ -103,27 +106,27 @@ export class ReferralService {
       {
         $lookup: {
           from: 'point_histories',
-          pipeline: [
-            {
-              $group: {
-                _id: null,
-                point: {
-                  $sum: '$point',
-                },
-              },
-            },
-          ],
           localField: 'userId',
           foreignField: 'ref',
           as: 'point_histories',
+          pipeline: [
+            {
+              $sort: {
+                createdAt: -1,
+              },
+            },
+          ],
         },
       },
       {
         $project: {
           point: {
-            $first: '$point_histories.point',
+            $sum: '$point_histories.point',
           },
           user: '$userId',
+          lastTime: {
+            $first: '$point_histories.createdAt',
+          },
         },
       },
       {
@@ -139,11 +142,20 @@ export class ReferralService {
       },
     ]);
 
-    const rs = new BaseResultPagination<{ userId: string; point: number }>();
-    rs.data = new PaginationDto<{ userId: string; point: number }>(
+    const rs = new BaseResultPagination<{
+      userId: string;
+      point: number;
+      lastTime: Date;
+    }>();
+    rs.data = new PaginationDto<{
+      userId: string;
+      point: number;
+      lastTime: Date;
+    }>(
       refs.map((r) => ({
         userId: r.user,
         point: r.point,
+        lastTime: r.lastTime,
       })),
       refs.length,
       params.page,

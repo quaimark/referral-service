@@ -10,5 +10,6 @@ export declare class ReferralService {
     getListReferralInfoByRefCode(refCode: string, params: BaseQueryParams): Promise<BaseResultPagination<{
         userId: string;
         point: number;
+        lastTime: Date;
     }>>;
 }

@@ -81,27 +81,27 @@ class ReferralService {
             {
                 $lookup: {
                     from: 'point_histories',
-                    pipeline: [
-                        {
-                            $group: {
-                                _id: null,
-                                point: {
-                                    $sum: '$point',
-                                },
-                            },
-                        },
-                    ],
                     localField: 'userId',
                     foreignField: 'ref',
                     as: 'point_histories',
+                    pipeline: [
+                        {
+                            $sort: {
+                                createdAt: -1,
+                            },
+                        },
+                    ],
                 },
             },
             {
                 $project: {
                     point: {
-                        $first: '$point_histories.point',
+                        $sum: '$point_histories.point',
                     },
                     user: '$userId',
+                    lastTime: {
+                        $first: '$point_histories.createdAt',
+                    },
                 },
             },
             {
@@ -120,6 +120,7 @@ class ReferralService {
         rs.data = new types_1.PaginationDto(refs.map((r) => ({
             userId: r.user,
             point: r.point,
+            lastTime: r.lastTime,
         })), refs.length, params.page, params.size);
         return rs;
     }
