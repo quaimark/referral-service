@@ -104,6 +104,7 @@ class ReferralService {
                     lastTime: {
                         $first: '$point_histories.createdAt',
                     },
+                    createdAt: '$createdAt',
                 },
             },
             {
@@ -121,6 +122,7 @@ class ReferralService {
             userId: r.user,
             point: r.point,
             lastTime: r.lastTime,
+            createdAt: r.createdAt,
         })), refs.length, params.page, params.size);
         return rs;
     }

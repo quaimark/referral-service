@@ -91,7 +91,12 @@ export class ReferralService {
     refCode: string,
     params: BaseQueryParams,
   ): Promise<
-    BaseResultPagination<{ userId: string; point: number; lastTime: Date }>
+    BaseResultPagination<{
+      userId: string;
+      point: number;
+      lastTime: Date;
+      createdAt: Date;
+    }>
   > {
     const sort: any = {};
     sort[params.orderBy || 'point'] = params.desc === 'asc' ? 1 : -1;
@@ -99,6 +104,7 @@ export class ReferralService {
       point: number;
       user: string;
       lastTime: Date;
+      createdAt: Date;
     }[] = await this.db.referralInfoModel.aggregate([
       {
         $match: {
@@ -129,6 +135,7 @@ export class ReferralService {
           lastTime: {
             $first: '$point_histories.createdAt',
           },
+          createdAt: '$createdAt',
         },
       },
       {
@@ -146,16 +153,19 @@ export class ReferralService {
       userId: string;
       point: number;
       lastTime: Date;
+      createdAt: Date;
     }>();
     rs.data = new PaginationDto<{
       userId: string;
       point: number;
       lastTime: Date;
+      createdAt: Date;
     }>(
       refs.map((r) => ({
         userId: r.user,
         point: r.point,
         lastTime: r.lastTime,
+        createdAt: r.createdAt,
       })),
       refs.length,
       params.page,

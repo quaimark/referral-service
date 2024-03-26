@@ -11,5 +11,6 @@ export declare class ReferralService {
         userId: string;
         point: number;
         lastTime: Date;
+        createdAt: Date;
     }>>;
 }
