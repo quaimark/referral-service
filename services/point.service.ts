@@ -467,7 +467,10 @@ export class PointService {
     return result;
   }
 
-  async userRefStats(userId: string): Promise<{
+  async userRefStats(
+    userId: string,
+    rankBy: 'countRef' | 'total' | 'count' = 'countRef',
+  ): Promise<{
     id: string;
     total: number;
     ranking: number;
@@ -535,7 +538,7 @@ export class PointService {
       },
       {
         $sort: {
-          total: -1,
+          [rankBy]: -1,
         },
       },
       {

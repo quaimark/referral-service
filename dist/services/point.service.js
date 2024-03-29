@@ -348,7 +348,7 @@ class PointService {
         })), total, page, size);
         return result;
     }
-    async userRefStats(userId) {
+    async userRefStats(userId, rankBy = 'countRef') {
         const total = await this.db.pointHistoryModel.countDocuments({
             user: userId,
             ref: { $ne: null },
@@ -402,7 +402,7 @@ class PointService {
             },
             {
                 $sort: {
-                    total: -1,
+                    [rankBy]: -1,
                 },
             },
             {
