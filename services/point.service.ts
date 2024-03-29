@@ -544,7 +544,7 @@ export class PointService {
       {
         $setWindowFields: {
           partitionBy: null,
-          sortBy: { total: -1 },
+          sortBy: { [rankBy]: -1 },
           output: { ranking: { $denseRank: {} } },
         },
       },
