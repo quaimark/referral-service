@@ -97,7 +97,7 @@ export class PointService {
       {
         $group: {
           _id: '$user',
-          seasonPoint: { $sum: '$point' },
+          // seasonPoint: { $sum: '$point' },
           tradePoint: {
             $sum: {
               $cond: [
@@ -115,8 +115,10 @@ export class PointService {
         },
       },
       {
-        $sort: {
-          seasonPoint: -1,
+        $set: {
+          seasonPoint: {
+            $sum: ['$tradePoint', '$refPoint'],
+          },
         },
       },
       {

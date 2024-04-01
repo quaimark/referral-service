@@ -59,7 +59,6 @@ class PointService {
             {
                 $group: {
                     _id: '$user',
-                    seasonPoint: { $sum: '$point' },
                     tradePoint: {
                         $sum: {
                             $cond: [
@@ -77,8 +76,10 @@ class PointService {
                 },
             },
             {
-                $sort: {
-                    seasonPoint: -1,
+                $set: {
+                    seasonPoint: {
+                        $sum: ['$tradePoint', '$refPoint'],
+                    },
                 },
             },
             {
