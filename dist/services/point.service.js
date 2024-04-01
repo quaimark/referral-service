@@ -85,7 +85,7 @@ class PointService {
                 $setWindowFields: {
                     partitionBy: null,
                     sortBy: { seasonPoint: -1 },
-                    output: { ranking: { $denseRank: {} } },
+                    output: { ranking: { $rank: {} } },
                 },
             },
             { $match: { _id: userId } },
@@ -348,7 +348,8 @@ class PointService {
         })), total, page, size);
         return result;
     }
-    async userRefStats(userId, rankBy = 'countRef') {
+    async userRefStats(userId, rankBy = 'allRef', time = new Date()) {
+        var _a, _b, _c, _d, _e;
         const total = await this.db.pointHistoryModel.countDocuments({
             user: userId,
             ref: { $ne: null },
@@ -356,6 +357,7 @@ class PointService {
         const refInfo = await this.db.referralInfoModel.findOne({ userId });
         const allRef = await this.db.referralInfoModel.countDocuments({
             referredBy: refInfo.referralCode,
+            updatedAt: { $lte: time },
         });
         if (!total)
             return {
@@ -366,61 +368,106 @@ class PointService {
                 countRef: 0,
                 allRef,
             };
-        const ranking = await this.db.pointHistoryModel.aggregate([
+        const ranking = await this.db.referralInfoModel.aggregate([
             {
                 $match: {
-                    ref: { $ne: null },
+                    referredBy: { $ne: null },
+                    updatedAt: { $lte: time },
                 },
             },
             {
                 $group: {
-                    _id: {
-                        user: '$user',
-                        ref: '$ref',
-                    },
-                    total: {
-                        $sum: '$point',
-                    },
-                    count: {
-                        $sum: 1,
-                    },
+                    _id: '$referredBy',
+                    allRef: { $sum: 1 },
                 },
             },
             {
-                $group: {
-                    _id: '$_id.user',
-                    countRef: {
-                        $sum: 1,
-                    },
-                    total: {
-                        $sum: '$total',
-                    },
-                    count: {
-                        $sum: '$count',
-                    },
+                $lookup: {
+                    from: 'referral_infos',
+                    localField: '_id',
+                    foreignField: 'referralCode',
+                    as: 'user',
                 },
             },
             {
-                $sort: {
-                    [rankBy]: -1,
+                $set: {
+                    userId: { $arrayElemAt: ['$user.userId', 0] },
+                },
+            },
+            {
+                $lookup: {
+                    from: 'point_histories',
+                    let: { userId: '$userId' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$$userId', '$user'] },
+                                        {
+                                            $lte: ['$blockTime', time.getTime()],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $match: {
+                                ref: { $ne: null },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: {
+                                    user: '$user',
+                                    ref: '$ref',
+                                },
+                                total: {
+                                    $sum: '$point',
+                                },
+                                count: { $sum: 1 },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: '$_id.user',
+                                total: { $sum: '$total' },
+                                countRef: { $sum: 1 },
+                                count: { $sum: '$count' },
+                            },
+                        },
+                    ],
+                    as: 'point',
+                },
+            },
+            {
+                $set: {
+                    total: { $arrayElemAt: ['$point.total', 0] },
+                    count: { $arrayElemAt: ['$point.count', 0] },
+                    countRef: { $arrayElemAt: ['$point.countRef', 0] },
                 },
             },
             {
                 $setWindowFields: {
                     partitionBy: null,
                     sortBy: { [rankBy]: -1 },
-                    output: { ranking: { $denseRank: {} } },
+                    output: { ranking: { $rank: {} } },
                 },
             },
             {
                 $match: {
-                    _id: userId,
+                    userId: userId,
                 },
             },
         ]);
-        const rs = ranking.length > 0
-            ? Object.assign(Object.assign({}, ranking[0]), { id: userId }) : { id: userId, total, ranking: -1, count: 0, countRef: 0 };
-        return Object.assign(Object.assign({}, rs), { allRef });
+        return {
+            id: userId,
+            total: ((_a = ranking[0]) === null || _a === void 0 ? void 0 : _a.total) || 0,
+            ranking: ((_b = ranking[0]) === null || _b === void 0 ? void 0 : _b.ranking) || -1,
+            count: ((_c = ranking[0]) === null || _c === void 0 ? void 0 : _c.count) || 0,
+            countRef: ((_d = ranking[0]) === null || _d === void 0 ? void 0 : _d.countRef) || 0,
+            allRef: ((_e = ranking[0]) === null || _e === void 0 ? void 0 : _e.allRef) || 0,
+        };
     }
 }
 exports.PointService = PointService;

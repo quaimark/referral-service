@@ -31,7 +31,7 @@ export declare class PointService {
         plusPercent?: number;
     }, passSeason?: Season): Promise<import("mongodb").BulkWriteResult>;
     topByRefCode(param: BaseQueryParams): Promise<BaseResultPagination<TopByRefDto>>;
-    userRefStats(userId: string, rankBy?: 'countRef' | 'total' | 'count'): Promise<{
+    userRefStats(userId: string, rankBy?: 'countRef' | 'total' | 'count' | 'allRef', time?: Date): Promise<{
         id: string;
         total: number;
         ranking: number;
