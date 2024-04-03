@@ -335,37 +335,38 @@ export class PointService {
             referralCode: userInfo.referredBy,
           })
         : undefined;
-      if (!refUser) return;
-      const refPoint = tradeVolumePoint * season.sponsorTradePointRatio;
-      refSource.push({
-        type: 'referral',
-        point: refPoint,
-      });
+      if (refUser) {
+        const refPoint = tradeVolumePoint * season.sponsorTradePointRatio;
+        refSource.push({
+          type: 'referral',
+          point: refPoint,
+        });
 
-      const refPointHistory: PointHistory = {
-        user: refUser.userId,
-        volume: pointHistory.volume,
-        txHash: pointHistory.txHash,
-        block: pointHistory.block,
-        chain: pointHistory.chain,
-        fee: pointHistory.fee,
-        point: refSource.reduce((a, b) => a + b.point, 0),
-        source: refSource,
-        ref: pointHistory.user,
-        blockTime: pointHistory.blockTime,
-        season: pointHistory.season,
-      };
+        const refPointHistory: PointHistory = {
+          user: refUser.userId,
+          volume: pointHistory.volume,
+          txHash: pointHistory.txHash,
+          block: pointHistory.block,
+          chain: pointHistory.chain,
+          fee: pointHistory.fee,
+          point: refSource.reduce((a, b) => a + b.point, 0),
+          source: refSource,
+          ref: pointHistory.user,
+          blockTime: pointHistory.blockTime,
+          season: pointHistory.season,
+        };
 
-      bulkWrite.push({
-        updateOne: {
-          filter: {
-            txHash: refPointHistory.txHash,
-            user: refPointHistory.user,
+        bulkWrite.push({
+          updateOne: {
+            filter: {
+              txHash: refPointHistory.txHash,
+              user: refPointHistory.user,
+            },
+            update: refPointHistory,
+            upsert: true,
           },
-          update: refPointHistory,
-          upsert: true,
-        },
-      });
+        });
+      }
     }
 
     if (h.addPointForSeller) {
