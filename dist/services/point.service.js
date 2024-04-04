@@ -340,12 +340,57 @@ class PointService {
                     count: '$count',
                 },
             },
+            {
+                $lookup: {
+                    from: 'point_histories',
+                    let: { userId: '$user' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$$userId', '$ref'] },
+                                        {
+                                            $lte: ['$blockTime', new Date().getTime()],
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: '$ref',
+                                total: { $sum: '$point' },
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                total: 1,
+                            },
+                        },
+                    ],
+                    as: 'point',
+                },
+            },
+            {
+                $set: {
+                    total: { $arrayElemAt: ['$point.total', 0] },
+                },
+            },
+            {
+                $sort: {
+                    count: -1,
+                    total: -1,
+                },
+            },
         ]);
         const total = data.length;
         result.data = new types_1.PaginationDto(data.map((t) => ({
             user: t.user,
             count: t.count,
             refCode: t._id,
+            total: t.total,
         })), total, page, size);
         return result;
     }
@@ -449,9 +494,14 @@ class PointService {
                 },
             },
             {
+                $addFields: {
+                    sortRank: [`$${rankBy}`, '$total'],
+                },
+            },
+            {
                 $setWindowFields: {
                     partitionBy: null,
-                    sortBy: { [rankBy]: -1 },
+                    sortBy: { sortRank: -1 },
                     output: { ranking: { $rank: {} } },
                 },
             },

@@ -46,4 +46,5 @@ export declare class TopByRefDto {
     user: string;
     refCode: string;
     count: number;
+    total: number;
 }
