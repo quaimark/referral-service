@@ -81,7 +81,7 @@ export class PointService {
     });
     if (!total)
       return {
-        ranking: -1,
+        ranking: 0,
       };
     const topPoints: {
       _id: string;
@@ -133,7 +133,7 @@ export class PointService {
     ]);
     topPoints.length > 0 && delete topPoints[0]._id;
 
-    return topPoints.length > 0 ? topPoints[0] : { ranking: -1 };
+    return topPoints.length > 0 ? topPoints[0] : { ranking: 0 };
   }
 
   async userPointHistory(
@@ -546,7 +546,7 @@ export class PointService {
       return {
         id: userId,
         total,
-        ranking: -1,
+        ranking: 0,
         count: 0,
         countRef: 0,
         allRef,
@@ -659,7 +659,7 @@ export class PointService {
     return {
       id: userId,
       total: ranking[0]?.total || 0,
-      ranking: ranking[0]?.ranking || -1,
+      ranking: ranking[0]?.ranking || 0,
       count: ranking[0]?.count || 0,
       countRef: ranking[0]?.countRef || 0,
       allRef: ranking[0]?.allRef || 0,

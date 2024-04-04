@@ -49,7 +49,7 @@ class PointService {
         const total = await this.db.pointHistoryModel.countDocuments(Object.assign({ user: userId }, match));
         if (!total)
             return {
-                ranking: -1,
+                ranking: 0,
             };
         const topPoints = await this.db.pointHistoryModel.aggregate([
             {
@@ -93,7 +93,7 @@ class PointService {
             { $project: { ranking: 1, seasonPoint: 1, tradePoint: 1, refPoint: 1 } },
         ]);
         topPoints.length > 0 && delete topPoints[0]._id;
-        return topPoints.length > 0 ? topPoints[0] : { ranking: -1 };
+        return topPoints.length > 0 ? topPoints[0] : { ranking: 0 };
     }
     async userPointHistory(userId, query) {
         const result = new types_1.BaseResultPagination();
@@ -409,7 +409,7 @@ class PointService {
             return {
                 id: userId,
                 total,
-                ranking: -1,
+                ranking: 0,
                 count: 0,
                 countRef: 0,
                 allRef,
@@ -514,7 +514,7 @@ class PointService {
         return {
             id: userId,
             total: ((_a = ranking[0]) === null || _a === void 0 ? void 0 : _a.total) || 0,
-            ranking: ((_b = ranking[0]) === null || _b === void 0 ? void 0 : _b.ranking) || -1,
+            ranking: ((_b = ranking[0]) === null || _b === void 0 ? void 0 : _b.ranking) || 0,
             count: ((_c = ranking[0]) === null || _c === void 0 ? void 0 : _c.count) || 0,
             countRef: ((_d = ranking[0]) === null || _d === void 0 ? void 0 : _d.countRef) || 0,
             allRef: ((_e = ranking[0]) === null || _e === void 0 ? void 0 : _e.allRef) || 0,
