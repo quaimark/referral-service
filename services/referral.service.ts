@@ -98,6 +98,14 @@ export class ReferralService {
       createdAt: Date;
     }>
   > {
+    const rs = new BaseResultPagination<{
+      userId: string;
+      point: number;
+      lastTime: Date;
+      createdAt: Date;
+    }>();
+
+    if (!refCode) return rs;
     const sort: any = {};
     sort[params.orderBy || 'point'] = params.desc === 'asc' ? 1 : -1;
     const refs: {
@@ -149,12 +157,6 @@ export class ReferralService {
       },
     ]);
 
-    const rs = new BaseResultPagination<{
-      userId: string;
-      point: number;
-      lastTime: Date;
-      createdAt: Date;
-    }>();
     rs.data = new PaginationDto<{
       userId: string;
       point: number;

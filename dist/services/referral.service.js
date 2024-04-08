@@ -72,6 +72,9 @@ class ReferralService {
         return ref;
     }
     async getListReferralInfoByRefCode(refCode, params) {
+        const rs = new types_1.BaseResultPagination();
+        if (!refCode)
+            return rs;
         const sort = {};
         sort[params.orderBy || 'point'] = params.desc === 'asc' ? 1 : -1;
         const refs = await this.db.referralInfoModel.aggregate([
@@ -117,7 +120,6 @@ class ReferralService {
                 $limit: params.size,
             },
         ]);
-        const rs = new types_1.BaseResultPagination();
         rs.data = new types_1.PaginationDto(refs.map((r) => ({
             userId: r.user,
             point: r.point,

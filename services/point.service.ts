@@ -538,6 +538,17 @@ export class PointService {
       ref: { $ne: null },
     });
     const refInfo = await this.db.referralInfoModel.findOne({ userId });
+
+    if (!refInfo)
+      return {
+        id: userId,
+        total,
+        ranking: 0,
+        count: 0,
+        countRef: 0,
+        allRef: 0,
+      };
+
     const allRef = await this.db.referralInfoModel.countDocuments({
       referredBy: refInfo.referralCode,
       updatedAt: { $lte: time },
@@ -640,7 +651,10 @@ export class PointService {
       },
       {
         $addFields: {
-          sortRank: [`$${rankBy}`, '$total'],
+          sortRank: {
+            [rankBy]: `$${rankBy}`,
+            total: '$total',
+          },
         },
       },
       {
