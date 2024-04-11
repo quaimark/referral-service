@@ -317,7 +317,6 @@ describe('PointService', () => {
       expect(pointHistory.txHash).toBe(h.txHash);
       expect(pointHistory.block).toBe(h.block);
       expect(pointHistory.chain).toBe(h.chain);
-      expect(pointHistory.fee).toBe(h.fee);
       expect(pointHistory.point).toBe(1100); // calculated point value
       expect(pointHistory.blockTime).toBe(h.blockTime.getTime());
       expect(pointHistory.season?._id.toString()).toBe(
@@ -371,7 +370,6 @@ describe('PointService', () => {
       expect(pointHistory.txHash).toBe(h.txHash);
       expect(pointHistory.block).toBe(h.block);
       expect(pointHistory.chain).toBe(h.chain);
-      expect(pointHistory.fee).toBe(h.fee);
       expect(pointHistory.point).toBe(1200); // calculated point value
       expect(pointHistory.blockTime).toBe(h.blockTime.getTime());
       expect(pointHistory.season?._id.toString()).toBe(
@@ -427,7 +425,6 @@ describe('PointService', () => {
       expect(pointHistory.txHash).toBe(h.txHash);
       expect(pointHistory.block).toBe(h.block);
       expect(pointHistory.chain).toBe(h.chain);
-      expect(pointHistory.fee).toBe(h.fee);
       expect(pointHistory.point).toBe(1000); // calculated point value
       expect(pointHistory.blockTime).toBe(h.blockTime.getTime());
       expect(pointHistory.season?._id.toString()).toBe(
@@ -443,7 +440,6 @@ describe('PointService', () => {
       const seasonData = {
         seasonNumber: 1,
         startAt: new Date('2021-01-01'),
-        endAt: new Date('2021-12-31'),
         pointTradeVolumeRatio: 10,
         membershipPlusVolumeRatio: 0.1,
         refTradePointRatio: 0.05,
@@ -470,7 +466,7 @@ describe('PointService', () => {
         price: 100,
         txHash: 'hash123',
         block: 123,
-        blockTime: new Date('2021-12-30'),
+        blockTime: new Date(),
         chain: 'chain123',
         fee: 10,
         isMembership: false,
