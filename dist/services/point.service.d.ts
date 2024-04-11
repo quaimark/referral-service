@@ -29,6 +29,7 @@ export declare class PointService {
         addPointForReferral?: boolean;
         addPointForSeller?: boolean;
         plusPercent?: number;
+        historyId?: string;
     }, passSeason?: Season): Promise<import("mongodb").BulkWriteResult>;
     topByRefCode(param: BaseQueryParams): Promise<BaseResultPagination<TopByRefDto>>;
     userRefStats(userId: string, rankBy?: 'countRef' | 'total' | 'count' | 'allRef', time?: Date): Promise<{

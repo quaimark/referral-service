@@ -7,7 +7,6 @@ import {
 import {
   BaseQueryParams,
   BaseResultPagination,
-  CollectionName,
   GetTopPointParams,
   PaginationDto,
   TopByRefDto,
@@ -251,10 +250,10 @@ export class PointService {
       addPointForReferral?: boolean;
       addPointForSeller?: boolean;
       plusPercent?: number;
+      historyId?: string;
     },
     passSeason?: Season,
   ) {
-    const fee = h.fee;
     const isMemberShip = h.addPointForMembership;
     const pointHistory: PointHistory = {
       user: h.to,
@@ -262,9 +261,9 @@ export class PointService {
       txHash: h.txHash,
       block: h.block,
       chain: h.chain,
-      fee,
       point: 0,
       blockTime: h.blockTime.getTime(),
+      historyId: h.historyId,
     };
 
     const season =
@@ -315,6 +314,7 @@ export class PointService {
     bulkWrite.push({
       updateOne: {
         filter: {
+          historyId: h.historyId,
           txHash: pointHistory.txHash,
           user: pointHistory.user,
         },
@@ -354,11 +354,13 @@ export class PointService {
           ref: pointHistory.user,
           blockTime: pointHistory.blockTime,
           season: pointHistory.season,
+          historyId: h.historyId,
         };
 
         bulkWrite.push({
           updateOne: {
             filter: {
+              historyId: h.historyId,
               txHash: refPointHistory.txHash,
               user: refPointHistory.user,
             },
@@ -386,10 +388,12 @@ export class PointService {
         ],
         blockTime: pointHistory.blockTime,
         season: pointHistory.season,
+        historyId: h.historyId,
       };
       bulkWrite.push({
         updateOne: {
           filter: {
+            historyId: h.historyId,
             txHash: sellerPointHistory.txHash,
             user: sellerPointHistory.user,
           },
@@ -410,6 +414,15 @@ export class PointService {
         });
       }
     }
+
+    if (h.historyId) {
+      // rm old flow point
+      await this.db.pointHistoryModel.deleteMany({
+        $or: [{ historyId: null }, { historyId: h.historyId }],
+        txHash: h.txHash,
+      });
+    }
+
     return await this.db.pointHistoryModel.bulkWrite(bulkWrite);
   }
 

@@ -34,11 +34,12 @@ export type PointHistory = {
     blockTime: number;
     point: number;
     source?: PointSource[];
-    fee: number;
+    fee?: number;
     volume: number;
     chain: string;
     user: string;
     ref?: string;
+    historyId: string;
     season?: SeasonDocument;
 };
 export type PointHistoryDocument = PointHistory & Document;

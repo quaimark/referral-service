@@ -11,6 +11,7 @@ exports.PointHistorySchema = new mongoose_1.Schema({
     source: [Object],
     fee: Number,
     volume: Number,
+    historyId: String,
     chain: String,
     user: String,
     ref: String,
@@ -20,6 +21,7 @@ exports.PointHistorySchema = new mongoose_1.Schema({
     autoIndex: true,
 });
 exports.PointHistorySchema.index({ user: 1 });
+exports.PointHistorySchema.index({ historyId: 1 });
 exports.PointHistorySchema.index({ ref: 1 });
 exports.PointHistorySchema.index({ blockTime: 1 });
 exports.PointHistorySchema.index({ 'source.type': 1 });

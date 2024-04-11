@@ -13,11 +13,12 @@ export type PointHistory = {
   blockTime: number;
   point: number;
   source?: PointSource[];
-  fee: number;
+  fee?: number;
   volume: number;
   chain: string;
   user: string;
   ref?: string;
+  historyId: string;
   season?: SeasonDocument;
 };
 
@@ -32,6 +33,7 @@ export const PointHistorySchema = new Schema<PointHistoryDocument>(
     source: [Object],
     fee: Number,
     volume: Number,
+    historyId: String,
     chain: String,
     user: String,
     ref: String,
@@ -44,6 +46,7 @@ export const PointHistorySchema = new Schema<PointHistoryDocument>(
 );
 
 PointHistorySchema.index({ user: 1 });
+PointHistorySchema.index({ historyId: 1 });
 PointHistorySchema.index({ ref: 1 });
 PointHistorySchema.index({ blockTime: 1 });
 PointHistorySchema.index({ 'source.type': 1 });
