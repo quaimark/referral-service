@@ -241,7 +241,7 @@ class PointService {
                     txHash: pointHistory.txHash,
                     block: pointHistory.block,
                     chain: pointHistory.chain,
-                    fee: pointHistory.fee,
+                    fee: h.fee,
                     point: refSource.reduce((a, b) => a + b.point, 0),
                     source: refSource,
                     ref: pointHistory.user,
