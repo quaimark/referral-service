@@ -7,7 +7,7 @@ class PointService {
         this.db = db;
         this.seasonService = seasonService;
     }
-    async getUserPoint(userId, seasonNumber) {
+    async getUserPoint({ userId, chainId, seasonNumber, }) {
         var _a;
         const season = seasonNumber
             ? await this.db.seasonModel.findOne({ seasonNumber })
@@ -18,6 +18,9 @@ class PointService {
             blockTime: { $gte: from.getTime() },
             user: userId,
         };
+        if (chainId) {
+            match.chain = chainId;
+        }
         if (to) {
             match.blockTime.$lte = to.getTime();
         }
@@ -34,7 +37,7 @@ class PointService {
         ]);
         return ((_a = point[0]) === null || _a === void 0 ? void 0 : _a.point) || 0;
     }
-    async getUserRanking(userId, seasonNumber) {
+    async getUserRanking({ userId, chainId, seasonNumber, }) {
         const season = seasonNumber
             ? await this.db.seasonModel.findOne({ seasonNumber })
             : await this.seasonService.getOrCreateCurrentSeason();
@@ -43,6 +46,9 @@ class PointService {
         const match = {
             blockTime: { $gte: from.getTime() },
         };
+        if (chainId) {
+            match.chain = chainId;
+        }
         if (to) {
             match.blockTime.$lte = to.getTime();
         }
@@ -98,8 +104,14 @@ class PointService {
     async userPointHistory(userId, query) {
         const result = new types_1.BaseResultPagination();
         const { page, skipIndex, size } = query;
+        const match = {
+            user: userId,
+        };
+        if (query.chainId) {
+            match.chain = query.chainId;
+        }
         const data = await this.db.pointHistoryModel
-            .find({ user: userId })
+            .find(match)
             .sort({ blockTime: -1 })
             .skip(skipIndex)
             .limit(size)
@@ -121,6 +133,9 @@ class PointService {
         };
         if (to) {
             match.blockTime.$lte = to.getTime();
+        }
+        if (param.chainId) {
+            match.chain = param.chainId;
         }
         const topPoints = await this.db.pointHistoryModel.aggregate([
             {
@@ -363,6 +378,7 @@ class PointService {
                                         {
                                             $lte: ['$blockTime', new Date().getTime()],
                                         },
+                                        param.chainId ? { $eq: ['$chain', param.chainId] } : {},
                                     ],
                                 },
                             },
@@ -404,7 +420,7 @@ class PointService {
         })), total, page, size);
         return result;
     }
-    async userRefStats(userId, rankBy = 'allRef', time = new Date()) {
+    async userRefStats(userId, rankBy = 'allRef', time = new Date(), chainId) {
         var _a, _b, _c, _d, _e;
         const total = await this.db.pointHistoryModel.countDocuments({
             user: userId,
@@ -472,6 +488,7 @@ class PointService {
                                         {
                                             $lte: ['$blockTime', time.getTime()],
                                         },
+                                        chainId ? { $eq: ['$chain', chainId] } : {},
                                     ],
                                 },
                             },

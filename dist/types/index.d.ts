@@ -40,7 +40,14 @@ export declare class TopPointDto {
     referralPoint: number;
 }
 export declare class GetTopPointParams extends BaseQueryParams {
-    seasonNumber: number;
+    seasonNumber?: number;
+    chainId?: string;
+}
+export declare class GetUserPointHistoriesDto extends BaseQueryParams {
+    chainId: string;
+}
+export declare class GetTopRefDto extends BaseQueryParams {
+    chainId: string;
 }
 export declare class TopByRefDto {
     user: string;

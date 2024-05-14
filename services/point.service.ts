@@ -8,6 +8,8 @@ import {
   BaseQueryParams,
   BaseResultPagination,
   GetTopPointParams,
+  GetTopRefDto,
+  GetUserPointHistoriesDto,
   PaginationDto,
   TopByRefDto,
   TopPointDto,
@@ -21,7 +23,15 @@ export class PointService {
     private readonly seasonService: SeasonService,
   ) {}
 
-  async getUserPoint(userId: string, seasonNumber?: number): Promise<number> {
+  async getUserPoint({
+    userId,
+    chainId,
+    seasonNumber,
+  }: {
+    userId: string;
+    seasonNumber?: number;
+    chainId?: string;
+  }): Promise<number> {
     const season = seasonNumber
       ? await this.db.seasonModel.findOne({ seasonNumber })
       : await this.seasonService.getOrCreateCurrentSeason();
@@ -33,6 +43,9 @@ export class PointService {
       blockTime: { $gte: from.getTime() },
       user: userId,
     };
+    if (chainId) {
+      match.chain = chainId;
+    }
     if (to) {
       match.blockTime.$lte = to.getTime();
     }
@@ -51,10 +64,15 @@ export class PointService {
     return point[0]?.point || 0;
   }
 
-  async getUserRanking(
-    userId: string,
-    seasonNumber?: number,
-  ): Promise<{
+  async getUserRanking({
+    userId,
+    chainId,
+    seasonNumber,
+  }: {
+    userId: string;
+    seasonNumber?: number;
+    chainId?: string;
+  }): Promise<{
     ranking: number;
     seasonPoint?: number;
     tradePoint?: number;
@@ -70,6 +88,9 @@ export class PointService {
     const match: any = {
       blockTime: { $gte: from.getTime() },
     };
+    if (chainId) {
+      match.chain = chainId;
+    }
     if (to) {
       match.blockTime.$lte = to.getTime();
     }
@@ -137,12 +158,18 @@ export class PointService {
 
   async userPointHistory(
     userId: string,
-    query: BaseQueryParams,
+    query: GetUserPointHistoriesDto,
   ): Promise<BaseResultPagination<PointHistoryDocument>> {
     const result = new BaseResultPagination<PointHistoryDocument>();
     const { page, skipIndex, size } = query;
+    const match: any = {
+      user: userId,
+    };
+    if (query.chainId) {
+      match.chain = query.chainId;
+    }
     const data = await this.db.pointHistoryModel
-      .find({ user: userId })
+      .find(match)
       .sort({ blockTime: -1 })
       .skip(skipIndex)
       .limit(size)
@@ -174,6 +201,9 @@ export class PointService {
     };
     if (to) {
       match.blockTime.$lte = to.getTime();
+    }
+    if (param.chainId) {
+      match.chain = param.chainId;
     }
     const topPoints: {
       seasonPoint: number;
@@ -426,7 +456,7 @@ export class PointService {
     return await this.db.pointHistoryModel.bulkWrite(bulkWrite);
   }
 
-  async topByRefCode(param: BaseQueryParams) {
+  async topByRefCode(param: GetTopRefDto) {
     const result = new BaseResultPagination<TopByRefDto>();
     const { page, skipIndex, size } = param;
     const data: {
@@ -482,6 +512,7 @@ export class PointService {
                     {
                       $lte: ['$blockTime', new Date().getTime()],
                     },
+                    param.chainId ? { $eq: ['$chain', param.chainId] } : {},
                   ],
                 },
               },
@@ -538,6 +569,7 @@ export class PointService {
     userId: string,
     rankBy: 'countRef' | 'total' | 'count' | 'allRef' = 'allRef',
     time: Date = new Date(),
+    chainId?: string,
   ): Promise<{
     id: string;
     total: number;
@@ -575,7 +607,6 @@ export class PointService {
         countRef: 0,
         allRef,
       };
-
     const ranking: {
       _id: string;
       total: number; // total point
@@ -622,6 +653,7 @@ export class PointService {
                     {
                       $lte: ['$blockTime', time.getTime()],
                     },
+                    chainId ? { $eq: ['$chain', chainId] } : {},
                   ],
                 },
               },

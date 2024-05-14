@@ -66,7 +66,10 @@ describe('PointService', () => {
       };
       await dbService.pointHistoryModel.create(pointHistoryData);
 
-      const result = await service.getUserPoint(user1, 1);
+      const result = await service.getUserPoint({
+        userId: user1,
+        seasonNumber: 1,
+      });
 
       expect(result).toBe(100);
     });
@@ -88,7 +91,9 @@ describe('PointService', () => {
       };
       await dbService.pointHistoryModel.create(pointHistoryData);
 
-      const result = await service.getUserPoint(user1);
+      const result = await service.getUserPoint({
+        userId: user1,
+      });
 
       expect(result).toBe(200);
     });
@@ -130,7 +135,10 @@ describe('PointService', () => {
       ];
       await dbService.pointHistoryModel.create(pointHistoryData);
 
-      const result = await service.getUserRanking(user2, 1);
+      const result = await service.getUserRanking({
+        userId: user2,
+        seasonNumber: 1,
+      });
 
       expect(result).toEqual({
         ranking: 1,
@@ -172,7 +180,7 @@ describe('PointService', () => {
       ];
       await dbService.pointHistoryModel.create(pointHistoryData);
 
-      const result = await service.getUserRanking(user2);
+      const result = await service.getUserRanking({ userId: user2 });
 
       expect(result).toEqual({
         ranking: 1,

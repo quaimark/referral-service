@@ -1,19 +1,27 @@
 import { PointHistoryDocument, Season } from 'models';
-import { BaseQueryParams, BaseResultPagination, GetTopPointParams, TopByRefDto, TopPointDto } from '../types';
+import { BaseResultPagination, GetTopPointParams, GetTopRefDto, GetUserPointHistoriesDto, TopByRefDto, TopPointDto } from '../types';
 import { DatabaseService } from './database.service';
 import { SeasonService } from './season.service';
 export declare class PointService {
     private readonly db;
     private readonly seasonService;
     constructor(db: DatabaseService, seasonService: SeasonService);
-    getUserPoint(userId: string, seasonNumber?: number): Promise<number>;
-    getUserRanking(userId: string, seasonNumber?: number): Promise<{
+    getUserPoint({ userId, chainId, seasonNumber, }: {
+        userId: string;
+        seasonNumber?: number;
+        chainId?: string;
+    }): Promise<number>;
+    getUserRanking({ userId, chainId, seasonNumber, }: {
+        userId: string;
+        seasonNumber?: number;
+        chainId?: string;
+    }): Promise<{
         ranking: number;
         seasonPoint?: number;
         tradePoint?: number;
         refPoint?: number;
     }>;
-    userPointHistory(userId: string, query: BaseQueryParams): Promise<BaseResultPagination<PointHistoryDocument>>;
+    userPointHistory(userId: string, query: GetUserPointHistoriesDto): Promise<BaseResultPagination<PointHistoryDocument>>;
     getTopPoints(param: GetTopPointParams): Promise<BaseResultPagination<TopPointDto>>;
     pointCalculate(h: {
         to: string;
@@ -31,8 +39,8 @@ export declare class PointService {
         plusPercent?: number;
         historyId?: string;
     }, passSeason?: Season): Promise<import("mongodb").BulkWriteResult>;
-    topByRefCode(param: BaseQueryParams): Promise<BaseResultPagination<TopByRefDto>>;
-    userRefStats(userId: string, rankBy?: 'countRef' | 'total' | 'count' | 'allRef', time?: Date): Promise<{
+    topByRefCode(param: GetTopRefDto): Promise<BaseResultPagination<TopByRefDto>>;
+    userRefStats(userId: string, rankBy?: 'countRef' | 'total' | 'count' | 'allRef', time?: Date, chainId?: string): Promise<{
         id: string;
         total: number;
         ranking: number;

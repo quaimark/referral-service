@@ -112,7 +112,15 @@ export class TopPointDto {
 }
 
 export class GetTopPointParams extends BaseQueryParams {
-  seasonNumber: number;
+  seasonNumber?: number;
+  chainId?: string;
+}
+
+export class GetUserPointHistoriesDto extends BaseQueryParams {
+  chainId: string;
+}
+export class GetTopRefDto extends BaseQueryParams {
+  chainId: string;
 }
 
 export class TopByRefDto {
