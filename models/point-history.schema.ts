@@ -49,4 +49,4 @@ PointHistorySchema.index({ historyId: 1 });
 PointHistorySchema.index({ ref: 1 });
 PointHistorySchema.index({ blockTime: 1 });
 PointHistorySchema.index({ 'source.type': 1 });
-PointHistorySchema.index({ user: 1, txHash: 1, chain: 1 }, { unique: true }); // user can only have one point history per txHash
+PointHistorySchema.index({ user: 1, historyId: 1 }, { unique: true }); // user can only have one point history per txHash

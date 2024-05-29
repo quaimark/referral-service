@@ -24,5 +24,5 @@ exports.PointHistorySchema.index({ historyId: 1 });
 exports.PointHistorySchema.index({ ref: 1 });
 exports.PointHistorySchema.index({ blockTime: 1 });
 exports.PointHistorySchema.index({ 'source.type': 1 });
-exports.PointHistorySchema.index({ user: 1, txHash: 1, chain: 1 }, { unique: true });
+exports.PointHistorySchema.index({ user: 1, historyId: 1 }, { unique: true });
 //# sourceMappingURL=point-history.schema.js.map
