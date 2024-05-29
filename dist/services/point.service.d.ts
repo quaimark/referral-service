@@ -6,6 +6,10 @@ export declare class PointService {
     private readonly db;
     private readonly seasonService;
     constructor(db: DatabaseService, seasonService: SeasonService);
+    getUsersPoint(activeAfter: Date): Promise<{
+        user: string;
+        total: number;
+    }[]>;
     getUserPoint({ userId, chainId, seasonNumber, }: {
         userId: string;
         seasonNumber?: number;

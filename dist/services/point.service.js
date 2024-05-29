@@ -7,6 +7,30 @@ class PointService {
         this.db = db;
         this.seasonService = seasonService;
     }
+    async getUsersPoint(activeAfter) {
+        const users = await this.db.pointHistoryModel.distinct('user', {
+            updatedAt: { $gte: activeAfter },
+        });
+        if (!users.length)
+            return [];
+        const result = await this.db.pointHistoryModel.aggregate([
+            {
+                $match: {
+                    user: { $in: users },
+                },
+            },
+            {
+                $group: {
+                    _id: '$user',
+                    total: { $sum: '$point' },
+                },
+            },
+        ]);
+        return result.map((r) => ({
+            user: r._id,
+            total: r.total,
+        }));
+    }
     async getUserPoint({ userId, chainId, seasonNumber, }) {
         var _a;
         const season = seasonNumber

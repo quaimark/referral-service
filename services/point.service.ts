@@ -5,7 +5,6 @@ import {
   SeasonDocument,
 } from 'models';
 import {
-  BaseQueryParams,
   BaseResultPagination,
   GetTopPointParams,
   GetTopRefDto,
@@ -22,6 +21,33 @@ export class PointService {
     private readonly db: DatabaseService,
     private readonly seasonService: SeasonService,
   ) {}
+
+  async getUsersPoint(
+    activeAfter: Date,
+  ): Promise<{ user: string; total: number }[]> {
+    const users = await this.db.pointHistoryModel.distinct('user', {
+      updatedAt: { $gte: activeAfter },
+    });
+    if (!users.length) return [];
+    const result = await this.db.pointHistoryModel.aggregate([
+      {
+        $match: {
+          user: { $in: users },
+        },
+      },
+      {
+        $group: {
+          _id: '$user',
+          total: { $sum: '$point' },
+        },
+      },
+    ]);
+
+    return result.map((r) => ({
+      user: r._id,
+      total: r.total,
+    }));
+  }
 
   async getUserPoint({
     userId,
