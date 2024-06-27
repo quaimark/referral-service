@@ -44,7 +44,7 @@ export declare class GetTopPointParams extends BaseQueryParams {
     chainId?: string;
 }
 export declare class GetUserPointHistoriesDto extends BaseQueryParams {
-    chainId: string;
+    chainId?: string;
 }
 export declare class GetTopRefDto extends BaseQueryParams {
     chainId: string;
