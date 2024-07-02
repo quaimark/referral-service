@@ -1,4 +1,4 @@
-import { Season } from 'models';
+import { Season } from './models';
 export declare const globalState: {
     defaultSeason: Season | undefined;
 };

@@ -1,4 +1,4 @@
-import { PointHistoryDocument, Season } from 'models';
+import { PointHistoryDocument, Season } from '../models';
 import { BaseResultPagination, GetTopPointParams, GetTopRefDto, GetUserPointHistoriesDto, TopByRefDto, TopPointDto } from '../types';
 import { DatabaseService } from './database.service';
 import { SeasonService } from './season.service';

@@ -3,7 +3,7 @@ import {
   PointHistoryDocument,
   Season,
   SeasonDocument,
-} from 'models';
+} from '../models';
 import {
   BaseResultPagination,
   GetTopPointParams,
