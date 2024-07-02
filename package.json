@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest --detectOpenHandles --forceExit",
     "build": "rm -rf ./dist && tsc",
-    "lint": "prettier --check .",
+    "lint": "eslint \"*.ts\" --fix",
     "format": "prettier --write .",
     "dev": "tsc -w"
   },
