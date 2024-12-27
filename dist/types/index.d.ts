@@ -38,6 +38,7 @@ export declare class TopPointDto {
     seasonPoint: number;
     tradingPoint: number;
     referralPoint: number;
+    collectionBonus: number;
 }
 export declare class GetTopPointParams extends BaseQueryParams {
     seasonNumber?: number;
