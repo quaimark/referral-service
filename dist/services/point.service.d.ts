@@ -24,6 +24,7 @@ export declare class PointService {
         seasonPoint?: number;
         tradePoint?: number;
         refPoint?: number;
+        collectionBonus?: number;
     }>;
     userPointHistory(userId: string, query: GetUserPointHistoriesDto): Promise<BaseResultPagination<PointHistoryDocument>>;
     getTopPoints(param: GetTopPointParams): Promise<BaseResultPagination<TopPointDto>>;

@@ -123,7 +123,15 @@ class PointService {
                 },
             },
             { $match: { _id: userId } },
-            { $project: { ranking: 1, seasonPoint: 1, tradePoint: 1, refPoint: 1 } },
+            {
+                $project: {
+                    ranking: 1,
+                    seasonPoint: 1,
+                    tradePoint: 1,
+                    refPoint: 1,
+                    collectionBonus: 1,
+                },
+            },
         ]);
         topPoints.length > 0 && delete topPoints[0]._id;
         return topPoints.length > 0 ? topPoints[0] : { ranking: 0 };

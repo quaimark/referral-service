@@ -103,6 +103,7 @@ export class PointService {
     seasonPoint?: number;
     tradePoint?: number;
     refPoint?: number;
+    collectionBonus?: number;
   }> {
     const season = seasonNumber
       ? await this.db.seasonModel.findOne({ seasonNumber })
@@ -177,7 +178,15 @@ export class PointService {
         },
       },
       { $match: { _id: userId } },
-      { $project: { ranking: 1, seasonPoint: 1, tradePoint: 1, refPoint: 1 } }, // Include both fields
+      {
+        $project: {
+          ranking: 1,
+          seasonPoint: 1,
+          tradePoint: 1,
+          refPoint: 1,
+          collectionBonus: 1,
+        },
+      }, // Include both fields
     ]);
     topPoints.length > 0 && delete topPoints[0]._id;
 
