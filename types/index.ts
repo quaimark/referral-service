@@ -109,6 +109,8 @@ export class TopPointDto {
   tradingPoint: number;
 
   referralPoint: number;
+
+  collectionBonus: number;
 }
 
 export class GetTopPointParams extends BaseQueryParams {

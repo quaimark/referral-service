@@ -236,6 +236,7 @@ export class PointService {
       _id: string;
       tradePoint: number;
       refPoint: number;
+      collectionBonus: number;
     }[] = await this.db.pointHistoryModel.aggregate([
       {
         $match: match,
@@ -244,19 +245,28 @@ export class PointService {
       {
         $group: {
           _id: '$user',
-          seasonPoint: { $sum: '$point' },
+          seasonPoint: { $sum: '$source.point' },
           tradePoint: {
             $sum: {
               $cond: [
                 { $in: ['$source.type', ['sell_volume', 'buy_volume']] },
-                '$point',
+                '$source.point',
                 0,
               ],
             },
           },
           refPoint: {
             $sum: {
-              $cond: [{ $eq: ['$source.type', 'referral'] }, '$point', 0],
+              $cond: [
+                { $eq: ['$source.type', 'referral'] },
+                '$source.point',
+                0,
+              ],
+            },
+          },
+          collectionBonus: {
+            $sum: {
+              $cond: [{ $eq: ['$source.type', 'plus'] }, '$source.point', 0],
             },
           },
         },
@@ -277,6 +287,7 @@ export class PointService {
         seasonPoint: t.seasonPoint,
         referralPoint: t.refPoint,
         tradingPoint: t.tradePoint,
+        collectionBonus: t.collectionBonus,
       })),
       topPoints.length,
       param.page,
