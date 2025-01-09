@@ -141,6 +141,7 @@ describe('PointService', () => {
       });
 
       expect(result).toEqual({
+        collectionBonus: 0,
         ranking: 1,
         seasonPoint: 200,
         tradePoint: 200,
@@ -183,6 +184,7 @@ describe('PointService', () => {
       const result = await service.getUserRanking({ userId: user2 });
 
       expect(result).toEqual({
+        collectionBonus: 0,
         ranking: 1,
         seasonPoint: 400,
         tradePoint: 400,
