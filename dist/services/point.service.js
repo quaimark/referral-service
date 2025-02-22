@@ -21,13 +21,17 @@ class PointService {
             },
             {
                 $group: {
-                    _id: '$user',
+                    _id: {
+                        user: '$user',
+                        season: '$season',
+                    },
                     total: { $sum: '$point' },
                 },
             },
         ]);
         return result.map((r) => ({
-            user: r._id,
+            user: r._id.user,
+            season: String(r._id.season),
             total: r.total,
         }));
     }

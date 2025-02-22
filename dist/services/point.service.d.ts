@@ -9,6 +9,7 @@ export declare class PointService {
     getUsersPoint(activeAfter: Date): Promise<{
         user: string;
         total: number;
+        season: string;
     }[]>;
     getUserPoint({ userId, chainId, seasonNumber, }: {
         userId: string;
