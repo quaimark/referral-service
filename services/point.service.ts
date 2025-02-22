@@ -24,7 +24,7 @@ export class PointService {
 
   async getUsersPoint(
     activeAfter: Date,
-  ): Promise<{ user: string; total: number; season: string }[]> {
+  ): Promise<{ user: string; total: number; season: string; chain: string }[]> {
     const users = await this.db.pointHistoryModel.distinct('user', {
       updatedAt: { $gte: activeAfter },
     });
@@ -40,6 +40,7 @@ export class PointService {
           _id: {
             user: '$user',
             season: '$season',
+            chain: '$chain',
           },
           total: { $sum: '$point' },
         },
@@ -49,6 +50,7 @@ export class PointService {
     return result.map((r) => ({
       user: r._id.user,
       season: String(r._id.season),
+      chain: r._id.chain,
       total: r.total,
     }));
   }

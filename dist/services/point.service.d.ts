@@ -10,6 +10,7 @@ export declare class PointService {
         user: string;
         total: number;
         season: string;
+        chain: string;
     }[]>;
     getUserPoint({ userId, chainId, seasonNumber, }: {
         userId: string;

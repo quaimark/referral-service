@@ -24,6 +24,7 @@ class PointService {
                     _id: {
                         user: '$user',
                         season: '$season',
+                        chain: '$chain',
                     },
                     total: { $sum: '$point' },
                 },
@@ -32,6 +33,7 @@ class PointService {
         return result.map((r) => ({
             user: r._id.user,
             season: String(r._id.season),
+            chain: r._id.chain,
             total: r.total,
         }));
     }
